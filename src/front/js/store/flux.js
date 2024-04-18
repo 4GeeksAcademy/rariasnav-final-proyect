@@ -13,7 +13,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 					background: "white",
 					initial: "white"
 				}
-			]
+			],
+			baseURL : 'https://legendary-tribble-97999g966jjxh47v-3001.app.github.dev/api',
+			users: [],
+			auth: false,
+			token: localStorage.getItem('token'),
+			loggedUser: {}
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -46,6 +51,84 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				//reset the global store
 				setStore({ demo: demo });
+			},
+			loadUserData: async () => {
+				const store = getStore()
+				try {
+					const response = await fetch(`${store.baseURL}/user`)
+					const data = await response.json()
+
+					if( response.ok ){
+						setStore({ users: data })
+					}
+				} catch (error) {
+					
+				}
+			},
+			createUser: async (user) => {
+				const store = getStore()
+				const actions = getActions()
+				try {
+					const requestOptions = {
+						method: 'POST',
+						headers: { 'Content-Type' : 'application/json' },
+						body: JSON.stringify(user)
+					}
+					const response = await fetch(`${store.baseURL}/signup`, requestOptions)
+					const data = await response.json()
+
+					if(response.ok){
+						actions.loadUserData()
+						return 201
+					}
+				} catch (error) {
+					
+				}
+			},
+			login: async (email, password) => {
+				const actions = getActions()
+				try {					
+					const requestOptions = {
+						method : 'POST',
+						headers : { 'Content-Type' : 'application/json'},
+						body : JSON.stringify({
+							"email" : email,
+							"password" : password
+						})
+					}
+					const response = await fetch(`${getStore().baseURL}/login`, requestOptions)
+					const data = await response.json()
+					if( response.status === 200 ){
+						setStore({ auth: true })
+					}					
+					if( response.ok){
+						localStorage.setItem("token", data.access_token);
+						actions.getInMyProfile()
+					}			
+				} catch (error) {
+					
+				}
+			},
+			logout: () => {
+				setStore({ auth: false })
+				localStorage.removeItem("token")
+			},
+			getInMyProfile: async () => {
+				const store = getStore()
+				try {
+					const requestOptions = {
+						method: 'GET',
+						headers : { 'Authorization': `Bearer ${store.token}`},						
+					}
+					const response = await fetch(`${store.baseURL}/profile`, requestOptions)
+					const data = await response.json()
+					
+					if( response.ok ){
+						store.loggedUser({ loggedUser: data })
+					}
+				} catch (error) {
+					
+				}
 			}
 		}
 	};
