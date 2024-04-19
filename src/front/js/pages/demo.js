@@ -2,9 +2,17 @@ import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 
 import { Context } from "../store/appContext";
+import countries from "../../json/countries.json"
 
 export const Demo = () => {
 	const { store, actions } = useContext(Context);
+
+	useEffect( ()=>{
+		for(let country of countries){
+			console.log(country.name)
+		}
+		
+	},[] )
 
 	return (
 		<div className="container">

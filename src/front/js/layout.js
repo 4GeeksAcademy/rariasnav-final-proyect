@@ -10,6 +10,7 @@ import { LoginRegisterPreview } from "./pages/loginRegisterPreview";
 import { SignUp } from "./pages/signUp";
 import { Login } from "./pages/login";
 import { GetInMyProfile } from "./pages/getInMyProfile";
+import { EditMyProfile } from "./pages/editMyProfile";
 
 import injectContext from "./store/appContext";
 
@@ -39,6 +40,7 @@ const Layout = () => {
                         <Route element={<SignUp />} path="/signUp" />
                         <Route element={<Login />} path="/login"  />
                         <Route element={<GetInMyProfile />} path="/myProfile" />
+                        <Route element={<EditMyProfile />} path="/editMyProfile" />
                     </Routes>
                     <Footer />
                 </ScrollToTop>

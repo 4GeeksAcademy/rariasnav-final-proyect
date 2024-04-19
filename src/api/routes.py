@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint, current_app
-from api.models import db, User, Country, PersonalDocument, Gender
+from api.models import db, User, Country, PersonalDocument
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -113,7 +113,6 @@ def login():
 def profile():
     user_email = get_jwt_identity()
     user = User.query.filter_by(email=user_email).first()
-    print(user.gender)
 
     response_body = {
         "msg": "User found",

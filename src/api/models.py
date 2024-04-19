@@ -7,6 +7,11 @@ class Roles(enum.Enum):
     client = 'client'
     vendor = 'vendor'
 
+class ChooseGender(enum.Enum):
+    non_binary = 'non_binary'
+    female = 'female'
+    male = 'male'
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -16,14 +21,21 @@ class User(db.Model):
     date_of_birth = db.Column(db.DateTime, unique=False, nullable=True)       
     phone_number = db.Column(db.Integer, unique=True, nullable=True)
     address = db.Column(db.String(120), unique=False, nullable=True)
+    profile_resume = db.Column(db.String(350), unique=False, nullable=True)
     role = db.Column(db.Enum(Roles), unique=False, nullable=False)
-    personal_document = db.relationship('PersonalDocument', backref='user', lazy=True)    
-    gender = db.relationship('Gender', backref='user', lazy=True)
+    gender = db.Column(db.Enum(ChooseGender), unique=False, nullable=True)
+    personal_document = db.relationship('PersonalDocument', backref='user', lazy=True)       
+    nationality_id = db.Column(db.Integer, db.ForeignKey('country.id'), nullable=True)
 
     def __repr__(self):
         return f'<User {self.email}>'
 
     def serialize(self):
+        personal_documents = PersonalDocument.query.filter_by(user_id=self.id)
+        personal_documents = list(map(lambda document: document.serialize(), personal_documents))
+
+        country = Country.query.get(self.nationality_id)
+
         return {
             "id": self.id,
             "email": self.email,
@@ -32,14 +44,16 @@ class User(db.Model):
             "date_of_birth": self.date_of_birth,            
             "phone_number": self.phone_number,
             "address": self.address,
-            "role": self.role.name,
-            "personal_document": self.personal_document,
-            "gender": self.gender
+            "role": self.role.value,
+            "gender": self.gender.value,
+            "personal_documents": personal_documents,
+            "nationality": country.serialize() 
         }
     
 class Country(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
+    user = db.relationship('User', backref='country', lazy=True)       
 
     def __repr__(self):
         return f'<Country {self.name}>'
@@ -67,25 +81,6 @@ class PersonalDocument(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "type": self.type.name,
+            "type": self.type.value,
             "code": self.code
-        }
-    
-class ChooseGender(enum.Enum):
-    non_binary = 'non_binary'
-    female = 'female'
-    male = 'male'
-
-class Gender(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    gender = db.Column(db.Enum(ChooseGender), unique=False, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    
-    def __repr__(self):
-        return f'<Gender {self.id}>'
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "gender": self.gender.name
         }
