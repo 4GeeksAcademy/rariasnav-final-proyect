@@ -1,14 +1,17 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import "../../styles/home.css";
+import countries from "../../json/countries.json"
 
 export const SignUp = () => {
     const {store, actions} = useContext(Context)
     const [user, setUser] = useState({
         "email": "",
         "password": "",
-        "is_active": true
+        "is_active": true,
+        "gender": "",
+        "nationality": ""
     })
     const navigate = useNavigate()
 
@@ -24,7 +27,7 @@ export const SignUp = () => {
         setUser({
             ...user, [e.target.name] : e.target.value
         })
-    }
+    }   
 
     return(
         <div className="Container">
@@ -40,7 +43,34 @@ export const SignUp = () => {
                         <label htmlFor="password" className="form-label">Password</label>
                         <input type="password" className="form-control" name="password" value={user.password}
                         onChange={handleChange}/>
-                    </div>                    
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="phone_number" className="form-label">Phone number</label>
+                        <input type="number" className="form-control" name="phone_number" value={user.phone_number}
+                        onChange={handleChange}/>
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="gender" className="form-label">Gender</label>                     
+                        <select className="form-select" aria-label="Default select example" name="gender"
+                        onChange={handleChange} value={user.gender}>
+                            <option disabled value={''}>Select your gender</option> 
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="non_binary">Non binary</option>                            
+                        </select>
+                    </div>  
+                    <div className="mb-3">
+                        <label htmlFor="nationality" className="form-label">Nationality</label>                     
+                        <select className="form-select" aria-label="Default select example" name="nationality"
+                        onChange={handleChange} value={user.nationality} >
+                            <option disabled value={''}>Select your country</option>  
+                            {countries.map( (country, index)=> {
+                                return(
+                                    <option key={index}>{country.name}</option>
+                                )
+                            } )}   
+                        </select>
+                    </div>                     
                     <button type="submit" className="btn btn-primary" onClick={ (e)=>saveUSer(e) }>Create account</button>
                 </form>
                                 

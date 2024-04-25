@@ -12,7 +12,7 @@ export const Login = () =>{
     async function sendData(e) {
         e.preventDefault()
         const result = await actions.login(loginEmail, loginPassword)
-        if( result==201){
+        if( result ){
             navigate('/demo')
         }
     }

@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint, current_app
-from api.models import db, User, Country, PersonalDocument
+from api.models import db, User, PersonalDocument
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -64,6 +64,9 @@ def create_user():
         new_user = User(
             email = body['email'],
             password = password_hash,
+            nationality = body['nationality'],
+            gender = body['gender'],
+            phone_number = body['phone_number'],
             is_active = True,
             role = 'client'
         )
@@ -116,6 +119,25 @@ def profile():
 
     response_body = {
         "msg": "User found",
-        "User": user.serialize()
+        "user": user.serialize()
+    }
+    return jsonify(response_body), 200
+
+@api.route('/user_information', methods=['PUT'])
+@jwt_required()
+def fill_user_information():
+    email = get_jwt_identity()
+    body = request.get_json()  
+    user = User.query.filter_by(email=email).first()
+    
+    for key in body:
+        for col in user.serialize():
+            if key == col and key != "id":
+                setattr(user, col, body[key])
+
+    db.session.commit()
+    
+    response_body = {
+        "msg": "succesfully updated"
     }
     return jsonify(response_body), 200

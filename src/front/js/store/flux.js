@@ -15,10 +15,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			],
 			baseURL : 'https://legendary-tribble-97999g966jjxh47v-3001.app.github.dev/api',
-			users: [],
-			auth: false,
-			token: localStorage.getItem('token'),
-			loggedUser: {}
+			users: [],		
+			loggedUser: null
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -66,6 +64,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 			createUser: async (user) => {
+				console.log(user)
 				const store = getStore()
 				const actions = getActions()
 				try {
@@ -74,8 +73,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						headers: { 'Content-Type' : 'application/json' },
 						body: JSON.stringify(user)
 					}
-					const response = await fetch(`${store.baseURL}/signup`, requestOptions)
-					const data = await response.json()
+					const response = await fetch(`${store.baseURL}/signup`, requestOptions)					
 
 					if(response.ok){
 						actions.loadUserData()
@@ -86,6 +84,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 			login: async (email, password) => {
+				const store = getStore()
 				const actions = getActions()
 				try {					
 					const requestOptions = {
@@ -96,35 +95,61 @@ const getState = ({ getStore, getActions, setStore }) => {
 							"password" : password
 						})
 					}
-					const response = await fetch(`${getStore().baseURL}/login`, requestOptions)
+					const response = await fetch(`${store.baseURL}/login`, requestOptions)
 					const data = await response.json()
-					if( response.status === 200 ){
-						setStore({ auth: true })
-					}					
+									
 					if( response.ok){
 						localStorage.setItem("token", data.access_token);
-						actions.getInMyProfile()
-					}			
+						setStore({ loggedUser: data.user })
+						return true
+					}
+					actions.logout()
+					return false			
 				} catch (error) {
-					
+					actions.logout()
+					return false					
 				}
 			},
 			logout: () => {
-				setStore({ auth: false })
+				setStore({ loggedUser: false })
 				localStorage.removeItem("token")
 			},
-			getInMyProfile: async () => {
+			getInMyProfile: async () => {	
 				const store = getStore()
+				const actions = getActions()			
 				try {
 					const requestOptions = {
 						method: 'GET',
-						headers : { 'Authorization': `Bearer ${store.token}`},						
+						headers : { 'Authorization': `Bearer ${localStorage.getItem('token')}`},						
 					}
 					const response = await fetch(`${store.baseURL}/profile`, requestOptions)
 					const data = await response.json()
 					
 					if( response.ok ){
-						store.loggedUser({ loggedUser: data })
+						setStore({ loggedUser: data.user })
+						return true
+					}
+					actions.logout()
+					return false	
+				} catch (error) {
+					actions.logout()
+					return false	
+				}
+			},
+			updateUserInformation: async (user) => {				
+				const store = getStore()
+				const actions = getActions()
+				try {
+					const requestOptions = {
+						method: 'PUT',
+						headers: {'Content-Type': 'application/JSON', 'Authorization': `Bearer ${localStorage.getItem('token')}`},
+						body: JSON.stringify(user)
+					}
+					const response = await fetch(`${store.baseURL}/user_information`, requestOptions)
+					
+					if( response.ok){
+						actions.getInMyProfile()
+						return 201
 					}
 				} catch (error) {
 					

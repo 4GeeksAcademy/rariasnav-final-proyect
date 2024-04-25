@@ -72,10 +72,10 @@ export const Home = () => {
 				<button className="button-group btn btn-outline-dark text-center m-auto border border-0" style={{width: "auto"}}
 				onClick={ ()=>navigate('/demo') }>
 					<div className="button-icon text-center m-auto">
-						<i className="fa-solid fa-bolt-lightning"></i>
+						<i className="fa-solid fa-gear"></i>
 					</div>					
 					<div className="button-body">
-						<p className="card-title">Electrical help</p>						
+						<p className="card-title">Mounting</p>						
 					</div>
 				</button>
 				<button className="button-group btn btn-outline-dark text-center m-auto border border-0" style={{width: "auto"}}

@@ -11,6 +11,8 @@ import { SignUp } from "./pages/signUp";
 import { Login } from "./pages/login";
 import { GetInMyProfile } from "./pages/getInMyProfile";
 import { EditMyProfile } from "./pages/editMyProfile";
+import { ServicesView } from "./pages/servicesView";
+import { PostForAService } from "./pages/postForAService";
 
 import injectContext from "./store/appContext";
 
@@ -41,6 +43,8 @@ const Layout = () => {
                         <Route element={<Login />} path="/login"  />
                         <Route element={<GetInMyProfile />} path="/myProfile" />
                         <Route element={<EditMyProfile />} path="/editMyProfile" />
+                        <Route element={<ServicesView />} path="/services" />
+                        <Route element={<PostForAService />} path="/postForAService"/>
                     </Routes>
                     <Footer />
                 </ScrollToTop>
