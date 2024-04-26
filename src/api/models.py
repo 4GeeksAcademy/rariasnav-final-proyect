@@ -99,7 +99,7 @@ class ServiceCategory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     icon = db.Column(db.String(10), unique=False, nullable=False)
-    image = db.Column(db.String(250), unique=False, nullable=False)
+    image = db.Column(db.String(250), unique=False, nullable=True)
     description = db.Column(db.String(120), unique=False, nullable=False)
     service_category_subcategory = db.relationship('ServiceCategorySubCategory', backref='servicecategory', lazy=True) 
     

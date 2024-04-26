@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint, current_app
-from api.models import db, User, PersonalDocument
+from api.models import db, User, PersonalDocument, ServiceCategory, ServiceSubCategory
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -141,3 +141,99 @@ def fill_user_information():
         "msg": "succesfully updated"
     }
     return jsonify(response_body), 200
+
+@api.route('/services_category', methods=['GET'])
+def get_all_services_category():
+    all_categories = ServiceCategory.query.all()
+    result = list(map(lambda category: category.serialize(), all_categories))
+
+    return jsonify(result), 200
+
+@api.route('/services_subcategory', methods=['GET'])
+def get_all_services_subcategory():
+    all_subcategories = ServiceSubCategory.query.all()
+    result = list(map(lambda subcategory: subcategory.serialize(), all_subcategories))
+
+    return jsonify(result), 200
+
+@api.route('/services_category/<int:category_id>', methods=['GET'])
+def get_category(category_id):
+    category = ServiceCategory.query.filter_by(id=category_id).first()
+
+    return jsonify(category.serialize()), 200
+
+@api.route('/services_subcategory/<int:subcategory_id>', methods=['GET'])
+def get_subcategory(subcategory_id):
+    subcategory = ServiceSubCategory.query.filter_by(id=subcategory_id).first()
+
+    return jsonify(subcategory.serialize()), 200
+
+@api.route('/services_category/<int:category_id>', methods=['DELETE'])
+def delete_category(category_id):
+    category = ServiceCategory.query.filter_by(id=category_id).first()
+    
+    db.session.delete(category)
+    db.session.commit()
+
+    return jsonify({"msg": "Category deleted"}), 200
+
+@api.route('/services_subcategory/<int:subcategory_id>', methods=['DELETE'])
+def delete_subcategory(subcategory_id):
+    subcategory = ServiceSubCategory.query.filter_by(id=subcategory_id).first()
+
+    db.session.delete(subcategory)
+    db.session.commit()
+
+    return jsonify({"msg": "Subcategory deleted"}), 200
+
+@api.route('/services_category', methods=['POST'])
+def add_category():
+    body = request.get_json()
+    new_category = ServiceCategory(
+        name = body['name'],
+        icon = body['icon'],
+        image = body['image'],
+        description = body['description']
+    )
+    db.session.add(new_category)
+    db.session.commit()
+
+    return jsonify({"msg": "Category created"}), 200
+
+@api.route('/services_subcategory', methods=['POST'])
+def add_subcategory():
+    body = request.get_json()
+    new_subcategory = ServiceSubCategory(
+        name = body['name'],
+        description = body['description']
+    )
+    db.session.add(new_subcategory)
+    db.session.commit()
+
+    return jsonify({"msg": "Subcategory created"}), 200
+
+@api.route('/services_category/<int:category_id>', methods=['PUT'])
+def update_category(category_id):
+    body = request.get_json()
+    category = ServiceCategory.query.filter_by(id=category_id).first()
+
+    category.name = body['name']
+    category.icon = body['icon']
+    category.image = body['image']
+    category.desciption = body['description']
+
+    db.session.commit()
+
+    return jsonify({"msg": "Category updated"})
+
+@api.route('/services_subcategory/<int:subcategory_id>', methods=['PUT'])
+def update_subcategory(subcategory_id):
+    body = request.get_json()
+    subcategory = ServiceSubCategory.query.filter_by(id=subcategory_id).first()
+
+    subcategory.name = body['name']
+    subcategory.desciption = body['description']
+
+    db.session.commit()
+
+    return jsonify({"msg": "Subcategory updated"})

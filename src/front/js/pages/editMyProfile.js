@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from "react";
 import { Context } from "../store/appContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import "../../styles/home.css";
 
 export const EditMyProfile = () => {
@@ -30,12 +30,20 @@ export const EditMyProfile = () => {
 
     useEffect( ()=> {
         if(store.loggedUser){
-            setUser(store.loggedUser)
+            setUser({
+                "full_name": store.loggedUser.full_name,
+                "date_of_birth": store.loggedUser.date_of_birth,
+                "address": store.loggedUser.address,
+                "profile_resume": store.loggedUser.profile_resume,
+                "knowledge": store.loggedUser.knowledge
+            })
         }
     },[store.loggedUser] )
 
     return(
         <div className="container">
+            {store.loggedUser == false && <Navigate to='/loginRegisterPreview'/>}
+            {store.loggedUser &&
             <div className="body m-5">
                 <h1>Profile data</h1>
                     <form>
@@ -65,7 +73,7 @@ export const EditMyProfile = () => {
                         <button className="btn btn-primary m-2" onClick={ ()=> navigate('/myProfile') }>Back</button>
                     </form>
                 
-            </div>
+            </div>}
         </div>
     )
 }

@@ -6,6 +6,8 @@ import "../../styles/home.css";
 export const PostForAService = () => {
     return(
         <div className="Container">
+            {store.loggedUser == false && <Navigate to='/loginRegisterPreview'/>}
+            {store.loggedUser &&
             <div className="body m-5">
                 <div className="text-center ">
                     <p className="">Tell us about your task, this will help us to find the better person for what you are looking for. </p>
@@ -38,7 +40,7 @@ export const PostForAService = () => {
                     </form>
                     
              
-            </div>
+            </div>}
         </div>
     )
 }

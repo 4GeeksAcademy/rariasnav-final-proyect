@@ -16,7 +16,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 			],
 			baseURL : 'https://legendary-tribble-97999g966jjxh47v-3001.app.github.dev/api',
 			users: [],		
-			loggedUser: null
+			loggedUser: null,
+			test: [],
+			categories: [],
+			subcategories: []
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -63,8 +66,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					
 				}
 			},
-			createUser: async (user) => {
-				console.log(user)
+			createUser: async (user) => {				
 				const store = getStore()
 				const actions = getActions()
 				try {
@@ -139,6 +141,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			updateUserInformation: async (user) => {				
 				const store = getStore()
 				const actions = getActions()
+				console.log(user)
 				try {
 					const requestOptions = {
 						method: 'PUT',
@@ -150,6 +153,45 @@ const getState = ({ getStore, getActions, setStore }) => {
 					if( response.ok){
 						actions.getInMyProfile()
 						return 201
+					}
+				} catch (error) {
+					
+				}
+			},
+			loadTestData: async ()=> {
+				try {
+					const response = await fetch('https://jsonplaceholder.typicode.com/users')
+					const data = await response.json()
+
+					if(response.ok){
+						
+						setStore({ test: data})
+					}
+				} catch (error) {
+					
+				}
+			},
+			getCategories: async ()=> {
+				const store = getStore()
+				try {
+					const response = await fetch(`${store.baseURL}/services_category`)
+					const data = await response.json()
+
+					if( response.ok ){
+						setStore({ categories: data })
+					}
+				} catch (error) {
+					
+				}
+			},
+			getSubcategories: async ()=>{
+				const store = getStore()
+				try {
+					const response = await fetch(`${store.baseURL}/services_subcategory`)
+					const data = await response.json()
+
+					if( response.ok ){
+						setStore({ subcategories: data })
 					}
 				} catch (error) {
 					

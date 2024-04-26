@@ -1,14 +1,16 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../store/appContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import "../../styles/home.css";
 
 export const GetInMyProfile = () =>{
     const {store, actions} = useContext(Context)
     const navigate = useNavigate()
+    const [user, setUser] = useState(store.loggedUser)
 
     return(
-        <div>      
+        <div className="container">
+            {store.loggedUser == false && <Navigate to='/loginRegisterPreview'/>}                            
             <div className="Portrait">
 				<div className="body text-center">
 					<div className="container">
@@ -27,13 +29,13 @@ export const GetInMyProfile = () =>{
                     <div className="col-md-9">
                         <div className="Profiletitle">
                             <div className="d-inline">
-                                <h1>user name</h1>
+                                <h1>{user.full_name}</h1>
                                 <button type="button" className="btn btn-light" onClick={ ()=>navigate('/editMyProfile') }><i className="fa-solid fa-gear"></i></button>
                             </div>
                                                        
                             <div className="row">
-                                <h5 className="col-md-4">Some knowledge</h5>
-                                <h5 className="col-md-4">Some knowledge</h5>
+                                <h5 className="col-md-4">{user.knowledge}</h5>
+                                <h5 className="col-md-4">{user.knowledge}</h5>
                             </div>
                         </div>                        
                     </div>                       
@@ -42,16 +44,16 @@ export const GetInMyProfile = () =>{
             <div className="ProfileResume mb-3 mt-5">
                 <div className="body">
                     <div className="container">
-                        <p>profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume profile resume </p>
+                        <p>{user.profile_resume}</p>
                     </div> 
                 </div>  
             </div>
             <div className="ProfileMoreInfo m-5">
                 <div className="body row m-5">                    
                         <div className="col-md-6 col-sm-12">
-                            <p>Date of birth</p>
-                            <p>gender</p>
-                            <p>More knowlede</p>
+                            <p>Birth date: {user.date_of_birth}</p>
+                            <p>Gender: {user.gender}</p>
+                            <p>Knowledge: {user.knowledge}</p>
                         </div>
                         <div className="card col-md-6 col-sm-12">
                             <div className="card text-bg-dark" style={{height: "6rem"}}>
@@ -75,8 +77,6 @@ export const GetInMyProfile = () =>{
                     </div> 
                 </div>  
             </div>                 
-        </div>
-        
-        
+        </div>   
     )
 }
