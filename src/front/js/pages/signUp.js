@@ -11,7 +11,8 @@ export const SignUp = () => {
         "password": "",
         "is_active": true,
         "gender": "",
-        "nationality": ""
+        "nationality": "",
+        "role": ""
     })
     const navigate = useNavigate()
 
@@ -70,7 +71,16 @@ export const SignUp = () => {
                                 )
                             } )}   
                         </select>
-                    </div>                     
+                    </div>   
+                    <div className="mb-3">
+                        <label htmlFor="role" className="form-label">What would you like to do?</label>                     
+                        <select className="form-select" aria-label="Default select example" name="role"
+                        onChange={handleChange} value={user.role}>
+                            <option disabled value={''}>Select an option</option> 
+                                    <option value="client">Look for services</option>
+                                    <option value="vendor">Offer my services</option>                           
+                        </select>
+                    </div>                  
                     <button type="submit" className="btn btn-primary" onClick={ (e)=>saveUSer(e) }>Create account</button>
                 </form>
                                 

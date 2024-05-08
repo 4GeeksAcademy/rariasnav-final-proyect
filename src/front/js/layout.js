@@ -13,6 +13,9 @@ import { GetInMyProfile } from "./pages/getInMyProfile";
 import { EditMyProfile } from "./pages/editMyProfile";
 import { ServicesView } from "./pages/servicesView";
 import { PostForAService } from "./pages/postForAService";
+import { RequestsHistory } from "./pages/requestsHistory";
+import { AvailableRequests } from "./pages/availableRequests";
+import { TakenRequests } from "./pages/takenRequests";
 
 import injectContext from "./store/appContext";
 
@@ -44,7 +47,10 @@ const Layout = () => {
                         <Route element={<GetInMyProfile />} path="/myProfile" />
                         <Route element={<EditMyProfile />} path="/editMyProfile" />
                         <Route element={<ServicesView />} path="/services" />
-                        <Route element={<PostForAService />} path="/postForAService"/>
+                        <Route element={<PostForAService />} path="/postForAService/:serviceSubcategoryId" />
+                        <Route element={<RequestsHistory />} path="/requestHistory" />
+                        <Route element={<AvailableRequests />} path="/availableRequests" />
+                        <Route element={<TakenRequests />} path="/takenRequests" />
                     </Routes>
                     <Footer />
                 </ScrollToTop>

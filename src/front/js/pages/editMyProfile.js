@@ -12,7 +12,7 @@ export const EditMyProfile = () => {
         "address":"",
         "profile_resume": "",
         "knowledge": ""
-    })
+    })    
 
     const handleChange = (e) =>{
         setUser({
@@ -39,6 +39,12 @@ export const EditMyProfile = () => {
             })
         }
     },[store.loggedUser] )
+
+    useEffect( ()=>{
+        actions.getSubcategories()
+    },[])
+
+    console.log(store.subcategories)
 
     return(
         <div className="container">
@@ -67,10 +73,18 @@ export const EditMyProfile = () => {
                         </div>
                         <div className="mb-3">
                             <label htmlFor="knowledge" className="form-label">Knowledge</label>
-                            <input type="text" className="form-control" aria-describedby="emailHelp" name="knowledge" value={user.knowledge} onChange={handleChange}/>                            
+                            <select className="form-select" aria-label="Default select example" name="knowledge"
+                            onChange={handleChange} value={user.knowledge}>
+                                <option disabled value={''}>Select an option</option>
+                                {store.subcategories.map( (subcategory)=>{
+                                    return(
+                                        <option key={subcategory.id} value={subcategory.name}>{subcategory.name}</option> 
+                                    )
+                                })}                                             
+                            </select>                            
                         </div>                   
-                        <button type="submit" className="btn btn-primary" onClick={ (e)=> saveInformation(e) }>Save</button>
-                        <button className="btn btn-primary m-2" onClick={ ()=> navigate('/myProfile') }>Back</button>
+                            <button type="submit" className="btn btn-primary" onClick={ (e)=> saveInformation(e) }>Save</button>
+                            <button className="btn btn-primary m-2" onClick={ ()=> navigate('/myProfile') }>Back</button>
                     </form>
                 
             </div>}

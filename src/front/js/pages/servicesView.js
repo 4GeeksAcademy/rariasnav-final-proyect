@@ -1,15 +1,19 @@
-import React,{useContext, useEffect} from "react";
+import React,{useContext, useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import "../../styles/home.css";
 
 export const ServicesView = () => {
     const {store, actions} = useContext(Context)
-
+    
     useEffect( ()=>{
         actions.getCategories()
     },[])    
 
+    useEffect( ()=>{
+        actions.getCategoriesSubcategories()
+    },[])
+    
     return(
         <div className="services-list-view">
             <div className="album py-5 bg-body-tertiary">
@@ -26,16 +30,13 @@ export const ServicesView = () => {
                                             <p className="card-text">{category.description}</p>
                                         </div>
                                         <ul className="list-group list-group-flush">
-                                            <li className="list-group-item">
-                                                <a href="#" className="card-link">Activities related</a>
-                                            </li>
-                                            <li className="list-group-item">
-                                                <a href="#" className="card-link">Activities related</a>
-                                            </li>
-                                            <li className="list-group-item">
-                                                <a href="#" className="card-link">Activities related</a>
-                                            </li>
-                                            
+                                            {store.categoriesSubcategories.filter( categorySubcategory => categorySubcategory.service_category.name === category.name ).map( (filteredCategorySubcategory)=> {
+                                                return(
+                                                    <li className="list-group-item" key={filteredCategorySubcategory.id}>
+                                                        <a href="#" className="card-link">{filteredCategorySubcategory.service_subcategory.name}</a>
+                                                    </li>
+                                                )
+                                            })}                                            
                                         </ul>                               
                                     </div>
                                 </div>

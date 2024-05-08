@@ -29,7 +29,10 @@ class User(db.Model):
     personal_document = db.relationship('PersonalDocument', backref='user', lazy=True)       
     # nationality_id = db.Column(db.Integer, db.ForeignKey('country.id'), nullable=True)
     nationality = db.Column(db.String(120), unique=False, nullable=True)
-    
+    service_request = db.relationship('ServiceRequest', backref='user', lazy=True) 
+    service_request_offer = db.relationship('ServiceRequestOffer', backref='user', foreign_keys='ServiceRequestOffer.user_client_id', lazy=True)
+    service_request_offer = db.relationship('ServiceRequestOffer', backref='user', foreign_keys='ServiceRequestOffer.user_vendor_id', lazy=True)
+
     def __repr__(self):
         return f'<User {self.email}>'
 
@@ -98,7 +101,8 @@ class ServiceCategory(db.Model):
     __tablename__ = 'servicecategory'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
-    icon = db.Column(db.String(10), unique=False, nullable=False)
+    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    icon = db.Column(db.String(80), unique=False, nullable=False)
     image = db.Column(db.String(250), unique=False, nullable=True)
     description = db.Column(db.String(120), unique=False, nullable=False)
     service_category_subcategory = db.relationship('ServiceCategorySubCategory', backref='servicecategory', lazy=True) 
@@ -112,15 +116,19 @@ class ServiceCategory(db.Model):
             "name": self.name,
             "icon": self.icon,
             "description": self.description,
-            "image": self.image
+            "image": self.image,
+            "is_active": self.is_active
         }
     
 class ServiceSubCategory(db.Model):
     __tablename__ = 'servicesubcategory'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
+    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
     description = db.Column(db.String(250), unique=False, nullable=False)
     service_category_subcategory = db.relationship('ServiceCategorySubCategory', backref='servicesubcategory', lazy=True) 
+    service_request = db.relationship('ServiceRequest', backref='servicesubcategory', lazy=True)
+    service_request_offer = db.relationship('ServiceRequestOffer', backref='servicesubcategory', lazy=True)
     
     def __repr__(self):
         return f'<ServiceSubCategory {self.name}>'
@@ -129,7 +137,8 @@ class ServiceSubCategory(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "description": self.description
+            "description": self.description,
+            "is_active": self.is_active
         }
     
 class ServiceCategorySubCategory(db.Model):
@@ -153,4 +162,68 @@ class ServiceCategorySubCategory(db.Model):
             "id": self.id,
             "service_category": service_category,
             "service_subcategory": service_subcategory
+        }
+
+class ServiceRequestStatus(enum.Enum):
+    active = 'active'
+    selected = 'selected'
+    taken = 'taken'
+    done = 'ddone'
+    
+class ServiceRequest(db.Model):
+    __tablename__='servicerequest'
+    id = db.Column(db.Integer, primary_key=True)
+    service_subcategory_id = db.Column(db.Integer, db.ForeignKey('servicesubcategory.id'), nullable=False)
+    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    status = db.Column(db.Enum(ServiceRequestStatus), unique=False, nullable=False)
+    description = db.Column(db.String(250), unique=False, nullable=False)
+    address = db.Column(db.String(80), unique=False, nullable=False)
+    tools = db.Column(db.String(250), unique=False, nullable=False)
+    moving = db.Column(db.String(250), unique=False, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    service_request_offer = db.relationship('ServiceRequestOffer', backref='servicerequest', lazy=True)
+
+    def __repr__(self):
+        return f'<ServiceRequest {self.id}>'
+
+    def serialize(self):
+        service_subcategory_id = ServiceSubCategory.query.get(self.service_subcategory_id)
+        if service_subcategory_id is not None:
+            service_subcategory_id = service_subcategory_id.serialize()
+        user = User.query.get(self.user_id)
+        if user is not None:
+            user = user.serialize()
+
+        return{
+            "id": self.id,
+            "service_subcategory_id": service_subcategory_id,
+            "description": self.description,
+            "address": self.address,
+            "tools": self.tools,
+            "moving": self.moving,
+            "user": user,
+            "is_active": self.is_active,
+            "status": self.status.name
+        }
+
+class ServiceRequestOffer(db.Model):
+    __tablename__='servicerequestoffer'
+    id = db.Column(db.Integer, primary_key=True)
+    service_subcategory_id = db.Column(db.Integer, db.ForeignKey('servicesubcategory.id'), nullable=False)
+    service_request_status = db.Column(db.Integer, db.ForeignKey('servicerequest.status'), nullable=False)
+    user_client_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_vendor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    rate = db.Column(db.Integer, unique=False, nullable=False)
+
+    def __repr__(self):
+        return f'<ServiceRequestOffer {self.id}>'
+    
+    def serialize(self):
+        return{
+            "id": self.id,
+            "service_subcategory_id": self.service_subcategory_id,
+            "service_request_status": self.service_request_status,
+            "user_client_id": self.user_client_id,
+            "user_vendor_id": self.user_vendor_id,
+            "rate": self.rate
         }

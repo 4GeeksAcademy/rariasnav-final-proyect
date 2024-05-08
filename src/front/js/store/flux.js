@@ -19,7 +19,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 			loggedUser: null,
 			test: [],
 			categories: [],
-			subcategories: []
+			subcategories: [],
+			categoriesSubcategories: [],
+			servicesRequests: []
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -141,7 +143,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 			updateUserInformation: async (user) => {				
 				const store = getStore()
 				const actions = getActions()
-				console.log(user)
 				try {
 					const requestOptions = {
 						method: 'PUT',
@@ -192,6 +193,75 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 					if( response.ok ){
 						setStore({ subcategories: data })
+					}					
+				} catch (error) {
+					
+				}
+			},
+			getCategoriesSubcategories: async ()=>{
+				const store = getStore()
+				try {
+					const response = await fetch(`${store.baseURL}/services_category_subcategory`)
+					const data = await response.json()
+
+					if( response.ok ){
+						setStore({ categoriesSubcategories: data })
+					}					
+				} catch (error) {
+					
+				}
+			},
+			postForAService: async (service_request)=>{
+				const store = getStore()
+				const actions = getActions()
+				try {
+					const requestOptions = {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/JSON', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+						body: JSON.stringify(service_request)
+					}
+					const response = await fetch(`${store.baseURL}/service_request`, requestOptions)
+					if( response.ok ){
+						actions.loadUserData()
+						return 201
+					}
+					
+				} catch (error) {
+					
+				}
+				
+			},
+			getServicesRequests: async () =>{
+				const store = getStore()
+				const actions = getActions()
+				try {
+					const requestOptions = {
+						method: 'GET',
+						headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}
+					}
+					const response = await fetch(`${store.baseURL}/service_request`, requestOptions)
+					const data = await response.json()
+					
+					if(response.ok){
+						setStore({ servicesRequests: data })
+					}
+				} 
+				catch (error) {
+					
+				}
+			},
+			cancelServiceRequest: async (filteredServiceRequestId)=>{
+				const store = getStore()
+				const actions = getActions()
+				try {
+					const requestOptions ={
+						method: 'DELETE',
+						headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+					}
+					const response = await fetch(`${store.baseURL}/service_request/${filteredServiceRequestId}`, requestOptions)
+					if( response.ok ){
+						actions.getServicesRequests()
+						return 201
 					}
 				} catch (error) {
 					

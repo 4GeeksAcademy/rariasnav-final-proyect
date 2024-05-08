@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint, current_app
-from api.models import db, User, PersonalDocument, ServiceCategory, ServiceSubCategory
+from api.models import db, User, PersonalDocument, ServiceCategory, ServiceSubCategory, ServiceCategorySubCategory, ServiceRequest, ServiceRequestOffer
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -68,7 +68,7 @@ def create_user():
             gender = body['gender'],
             phone_number = body['phone_number'],
             is_active = True,
-            role = 'client'
+            role = body['role']
         )
         db.session.add(new_user)
         db.session.commit()
@@ -144,15 +144,22 @@ def fill_user_information():
 
 @api.route('/services_category', methods=['GET'])
 def get_all_services_category():
-    all_categories = ServiceCategory.query.all()
+    all_categories = ServiceCategory.query.filter_by(is_active=True).all()
     result = list(map(lambda category: category.serialize(), all_categories))
 
     return jsonify(result), 200
 
 @api.route('/services_subcategory', methods=['GET'])
 def get_all_services_subcategory():
-    all_subcategories = ServiceSubCategory.query.all()
+    all_subcategories = ServiceSubCategory.query.filter_by(is_active=True).all()
     result = list(map(lambda subcategory: subcategory.serialize(), all_subcategories))
+
+    return jsonify(result), 200
+
+@api.route('/services_category_subcategory', methods=['GET'])
+def get_all_services_category_subcategory():
+    all_category_subcategory = ServiceCategorySubCategory.query.all()
+    result = list(map(lambda category_subcategory : category_subcategory.serialize(), all_category_subcategory))
 
     return jsonify(result), 200
 
@@ -163,37 +170,59 @@ def get_category(category_id):
     return jsonify(category.serialize()), 200
 
 @api.route('/services_subcategory/<int:subcategory_id>', methods=['GET'])
+@jwt_required()
 def get_subcategory(subcategory_id):
     subcategory = ServiceSubCategory.query.filter_by(id=subcategory_id).first()
 
     return jsonify(subcategory.serialize()), 200
 
+@api.route('/services_category_subcategory/<int:category_subcategory_id>', methods=['GET'])
+@jwt_required()
+def get_category_subcategory_id(category_subcategory_id):
+    category_subcategory = ServiceCategorySubCategory.query.filter_by(id=category_subcategory_id).first()
+
+    return jsonify(category_subcategory.serialize()), 200
+
 @api.route('/services_category/<int:category_id>', methods=['DELETE'])
+@jwt_required()
 def delete_category(category_id):
     category = ServiceCategory.query.filter_by(id=category_id).first()
     
-    db.session.delete(category)
+    setattr(category, 'is_active', False)
     db.session.commit()
 
     return jsonify({"msg": "Category deleted"}), 200
 
 @api.route('/services_subcategory/<int:subcategory_id>', methods=['DELETE'])
+@jwt_required()
 def delete_subcategory(subcategory_id):
     subcategory = ServiceSubCategory.query.filter_by(id=subcategory_id).first()
 
-    db.session.delete(subcategory)
+    setattr(subcategory, 'is_active', False)
     db.session.commit()
 
     return jsonify({"msg": "Subcategory deleted"}), 200
 
+@api.route('/services_category_subcategory/<int:category_subcategory_id>', methods=['DELETE'])
+@jwt_required()
+def delete_category_subcategory(category_subcategory_id):
+    category_subcategory = ServiceCategorySubCategory.query.filter_by(id=category_subcategory_id).first()
+
+    db.session.delete(category_subcategory)
+    db.session.commit()
+
+    return jsonify({"msg": "CategorySubcategory deleted"}), 200
+
 @api.route('/services_category', methods=['POST'])
+@jwt_required()
 def add_category():
     body = request.get_json()
     new_category = ServiceCategory(
         name = body['name'],
         icon = body['icon'],
         image = body['image'],
-        description = body['description']
+        description = body['description'],
+        is_active = True
     )
     db.session.add(new_category)
     db.session.commit()
@@ -201,18 +230,37 @@ def add_category():
     return jsonify({"msg": "Category created"}), 200
 
 @api.route('/services_subcategory', methods=['POST'])
+@jwt_required()
 def add_subcategory():
     body = request.get_json()
     new_subcategory = ServiceSubCategory(
         name = body['name'],
-        description = body['description']
+        description = body['description'],
+        is_active = True
     )
     db.session.add(new_subcategory)
     db.session.commit()
 
     return jsonify({"msg": "Subcategory created"}), 200
 
+@api.route('/services_category_subcategory', methods=['POST'])
+@jwt_required()
+def add_category_subcategory():
+    body= request.get_json()
+    service_category = ServiceCategory.query.filter_by(id=body['service_category_id']).first()
+    service_subcategory = ServiceSubCategory.query.filter_by(id=body['service_subcategory_id']).first()
+    new_category_subcategory = ServiceCategorySubCategory(
+        service_category_id = service_category.id,
+        service_subcategory_id = service_subcategory.id
+    )
+
+    db.session.add(new_category_subcategory)
+    db.session.commit()
+
+    return jsonify({"msg": "CategorySubcategory created"}), 200
+
 @api.route('/services_category/<int:category_id>', methods=['PUT'])
+@jwt_required()
 def update_category(category_id):
     body = request.get_json()
     category = ServiceCategory.query.filter_by(id=category_id).first()
@@ -224,9 +272,10 @@ def update_category(category_id):
 
     db.session.commit()
 
-    return jsonify({"msg": "Category updated"})
+    return jsonify({"msg": "Category updated"}), 200
 
 @api.route('/services_subcategory/<int:subcategory_id>', methods=['PUT'])
+@jwt_required()
 def update_subcategory(subcategory_id):
     body = request.get_json()
     subcategory = ServiceSubCategory.query.filter_by(id=subcategory_id).first()
@@ -236,4 +285,68 @@ def update_subcategory(subcategory_id):
 
     db.session.commit()
 
-    return jsonify({"msg": "Subcategory updated"})
+    return jsonify({"msg": "Subcategory updated"}), 200
+
+@api.route('/service_request', methods=['GET'])
+@jwt_required()
+def get_all_services_requests():
+    services_requests = ServiceRequest.query.all()
+    result = list(map(lambda service_request: service_request.serialize(), services_requests))
+
+    return jsonify(result), 200
+
+@api.route('/service_request/<int:service_request_id>', methods=['GET'])
+@jwt_required()
+def get_service_request(service_request_id):
+    service_request = ServiceRequest.query.filter_by(id=service_request_id).first()
+    if service_request is None:
+        return jsonify({"msg": "Service request not found"})
+
+    return jsonify(service_request.serialize()), 200
+
+@api.route('/user_service_request', methods=['GET'])
+@jwt_required()
+def get_user_service_request():
+    service_request = 0
+    if service_request is None:
+        return jsonify({"msg": "Service request not found"})
+
+    return jsonify(service_request.serialize()), 200
+
+@api.route('/service_request', methods=['POST'])
+@jwt_required()
+def add_service_request():
+    body = request.get_json()
+    email = body['email']
+    print('this email', email)    
+    service_subcategory_id = ServiceSubCategory.query.get(body['service_subcategory_id'])
+    if not service_subcategory_id:
+        return jsonify({"msg": "Service id not valid"}), 400 
+    user = User.query.filter_by(email=body['email']).first()    
+    
+    if user:
+        service_request = ServiceRequest(
+            description = body['description'],
+            address = body['address'],
+            tools = body['tools'],
+            moving = body['moving'],
+            service_subcategory_id = body['service_subcategory_id'],
+            user_id = user.id,
+            is_active = True,
+            status = 'active'
+        )
+
+        db.session.add(service_request)
+        db.session.commit()
+        return jsonify({"msg": "Service request added"}), 200
+    else:
+        return jsonify({"msg": "Email not valid"}), 400
+
+@api.route('/service_request/<int:service_request_id>', methods=['DELETE'])
+def delete_service_request(service_request_id):
+    service_request = ServiceRequest.query.filter_by(id=service_request_id).first()
+    setattr(service_request, 'is_active', False)
+
+    db.session.commit()
+
+    return jsonify({"msg": "Service request deleted"}), 200
