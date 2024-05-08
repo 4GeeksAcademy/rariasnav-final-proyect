@@ -9,8 +9,6 @@ export const PostForAService = () => {
     const {serviceSubcategoryId} = useParams()
     const user = store.loggedUser
     const [service_request, setServiceRequest] = useState({
-        "is_active": true,
-        "status": "active",
         "address": " ",
         "description": " ",
         "tools": " ",

@@ -8,7 +8,7 @@ export const LoginRegisterPreview = () => {
         <div className="Container">
             <div className="body text-center m-5">
                 <div className="d-grid gap-2 m-auto" style={{width: "26rem"}}>
-                    <h1>Website name</h1>
+                    <h1>Taskit</h1>
                     <button className="btn btn-primary" type="button" onClick={ ()=> navigate('/signUp') }>Sign up</button>
                     <button className="btn btn-primary" type="button" onClick={ ()=> navigate('/login') }>Log in</button>
                 </div>

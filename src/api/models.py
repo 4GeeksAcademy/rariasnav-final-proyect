@@ -30,8 +30,8 @@ class User(db.Model):
     # nationality_id = db.Column(db.Integer, db.ForeignKey('country.id'), nullable=True)
     nationality = db.Column(db.String(120), unique=False, nullable=True)
     service_request = db.relationship('ServiceRequest', backref='user', lazy=True) 
-    service_request_offer = db.relationship('ServiceRequestOffer', backref='user', foreign_keys='ServiceRequestOffer.user_client_id', lazy=True)
-    service_request_offer = db.relationship('ServiceRequestOffer', backref='user', foreign_keys='ServiceRequestOffer.user_vendor_id', lazy=True)
+    service_request_offer = db.relationship('ServiceRequestOffer', uselist=True, backref='user', foreign_keys='ServiceRequestOffer.user_client_id', lazy=True)
+    service_request_offer = db.relationship('ServiceRequestOffer', uselist=True, backref='user', foreign_keys='ServiceRequestOffer.user_vendor_id', lazy=True)
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -128,7 +128,6 @@ class ServiceSubCategory(db.Model):
     description = db.Column(db.String(250), unique=False, nullable=False)
     service_category_subcategory = db.relationship('ServiceCategorySubCategory', backref='servicesubcategory', lazy=True) 
     service_request = db.relationship('ServiceRequest', backref='servicesubcategory', lazy=True)
-    service_request_offer = db.relationship('ServiceRequestOffer', backref='servicesubcategory', lazy=True)
     
     def __repr__(self):
         return f'<ServiceSubCategory {self.name}>'
@@ -165,10 +164,9 @@ class ServiceCategorySubCategory(db.Model):
         }
 
 class ServiceRequestStatus(enum.Enum):
-    active = 'active'
-    selected = 'selected'
+    pending = 'pending'
     taken = 'taken'
-    done = 'ddone'
+    done = 'done'
     
 class ServiceRequest(db.Model):
     __tablename__='servicerequest'
@@ -206,11 +204,16 @@ class ServiceRequest(db.Model):
             "status": self.status.name
         }
 
+class ServiceRequestOfferStatus(enum.Enum):
+    accepted = 'accepted'
+    pending = 'pending'
+    declined = 'declined'
+
 class ServiceRequestOffer(db.Model):
     __tablename__='servicerequestoffer'
     id = db.Column(db.Integer, primary_key=True)
-    service_subcategory_id = db.Column(db.Integer, db.ForeignKey('servicesubcategory.id'), nullable=False)
-    service_request_status = db.Column(db.Integer, db.ForeignKey('servicerequest.status'), nullable=False)
+    service_request_id = db.Column(db.Integer, db.ForeignKey('servicerequest.id'), nullable=False)
+    status = db.Column(db.Enum(ServiceRequestOfferStatus), unique=False, nullable=False)
     user_client_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user_vendor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     rate = db.Column(db.Integer, unique=False, nullable=False)
@@ -221,8 +224,8 @@ class ServiceRequestOffer(db.Model):
     def serialize(self):
         return{
             "id": self.id,
-            "service_subcategory_id": self.service_subcategory_id,
-            "service_request_status": self.service_request_status,
+            "service_request_id": self.service_request_id,
+            "status": self.status.name,
             "user_client_id": self.user_client_id,
             "user_vendor_id": self.user_vendor_id,
             "rate": self.rate

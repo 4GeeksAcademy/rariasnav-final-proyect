@@ -304,15 +304,6 @@ def get_service_request(service_request_id):
 
     return jsonify(service_request.serialize()), 200
 
-@api.route('/user_service_request', methods=['GET'])
-@jwt_required()
-def get_user_service_request():
-    service_request = 0
-    if service_request is None:
-        return jsonify({"msg": "Service request not found"})
-
-    return jsonify(service_request.serialize()), 200
-
 @api.route('/service_request', methods=['POST'])
 @jwt_required()
 def add_service_request():
@@ -333,7 +324,7 @@ def add_service_request():
             service_subcategory_id = body['service_subcategory_id'],
             user_id = user.id,
             is_active = True,
-            status = 'active'
+            status = 'pending'
         )
 
         db.session.add(service_request)
@@ -350,3 +341,5 @@ def delete_service_request(service_request_id):
     db.session.commit()
 
     return jsonify({"msg": "Service request deleted"}), 200
+
+

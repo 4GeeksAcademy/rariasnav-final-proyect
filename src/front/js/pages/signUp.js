@@ -33,7 +33,7 @@ export const SignUp = () => {
     return(
         <div className="Container">
             <div className="body text-center m-5">
-                <h1>Website name</h1>
+                <h1>Taskit</h1>
                 <form className="m-auto" style={{width: "26rem"}}>
                     <div className="mb-3">
                         <label htmlFor="email" className="form-label">Email address</label>
