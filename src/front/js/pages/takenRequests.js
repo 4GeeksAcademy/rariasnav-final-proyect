@@ -19,7 +19,7 @@ export const TakenRequests = () =>{
                         <p className="">description</p>
                         <p className="">moving</p>
                         <p className="">tools</p>
-                        <button type="submit" className="btn btn-danger" onClick={ ()=>actions.cancelServiceRequest()}>Cancel offer</button>
+                        <button type="submit" className="btn btn-danger">Cancel offer</button>
                     </div> 
                 </div>
             </div>

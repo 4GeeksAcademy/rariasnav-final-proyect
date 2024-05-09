@@ -17,8 +17,6 @@ export const PostForAService = () => {
         "service_subcategory_id": serviceSubcategoryId
     })
 
-    console.log(store.loggedUser)
-
     useEffect( ()=>{
         if(!store.loggedUser){
             navigate('/loginRegisterPreview')

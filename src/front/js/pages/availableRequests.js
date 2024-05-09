@@ -18,7 +18,7 @@ export const AvailableRequests = () =>{
                     <h1 className="">Offers you can take</h1>
                 </div>
                 <div className="list-group">
-                    {store.servicesRequests.filter( serviceRequest => serviceRequest.is_active === true && serviceRequest.status === 'active').map( (filteredServiceRequest) => {
+                    {store.servicesRequests.filter( serviceRequest => serviceRequest.is_active === true && serviceRequest.status === 'pending').map( (filteredServiceRequest) => {
                         return(
                             <div className="list-group-item mb-3" key={filteredServiceRequest.id}>
                                 <div className="d-flex justify-content-between">

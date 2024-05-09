@@ -334,12 +334,19 @@ def add_service_request():
         return jsonify({"msg": "Email not valid"}), 400
 
 @api.route('/service_request/<int:service_request_id>', methods=['DELETE'])
+@jwt_required()
 def delete_service_request(service_request_id):
     service_request = ServiceRequest.query.filter_by(id=service_request_id).first()
-    setattr(service_request, 'is_active', False)
+    setattr(service_request, 'pending', False)
 
     db.session.commit()
 
     return jsonify({"msg": "Service request deleted"}), 200
 
+@api.route('/service_request_offer', methods=['GET'])
+@jwt_required()
+def get_all_service_request_offer():
+    service_request_offers = ServiceRequestOffer.query.all()
+    result = list(map(lambda service_request_offer: service_request_offer.serialize() ,service_request_offers))
 
+    return jsonify(result), 200
