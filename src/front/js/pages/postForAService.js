@@ -13,7 +13,6 @@ export const PostForAService = () => {
         "description": " ",
         "tools": " ",
         "moving": " ",
-        "email": user.email,
         "service_subcategory_id": serviceSubcategoryId
     })
 
@@ -26,7 +25,6 @@ export const PostForAService = () => {
     async function saveServiceRequest(e){
         e.preventDefault()
         const result = await actions.postForAService(service_request)
-        console.log(result)
         if( result == 201 ){
             navigate("/requestHistory")
         }
@@ -38,14 +36,15 @@ export const PostForAService = () => {
         })
     }
 
-    useEffect( ()=>{
-        if(store.loggedUser.role === 'vendor'){
-            navigate('/')
-        }
-    },[])
+    // useEffect( ()=>{
+    //     if(store.loggedUser.role === 'vendor'){
+    //         navigate('/')
+    //     }
+    // },[])
 
     return(
-        <div className="Container">            
+        <div className="Container"> 
+            {store.loggedUser.role != 'client' && <Navigate to='/'/>}            
             {store.loggedUser && store.loggedUser.role === 'client' &&
             <div className="body m-5">
                 <div className="text-center ">

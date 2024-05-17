@@ -6,19 +6,33 @@ import "../../styles/home.css";
 export const EditMyProfile = () => {
     const {store, actions} = useContext(Context)
     const navigate = useNavigate()
+
     const [user, setUser] = useState({
         "full_name": "",
         "date_of_birth": "",
         "address":"",
         "profile_resume": "",
-        "knowledge": ""
-    })    
+        "knowledge": []
+    })  
 
     const handleChange = (e) =>{
         setUser({
             ...user, [e.target.name]: e.target.value
-        })
+        })        
     }
+
+    const handleSubCategoryChange = (event) => {
+        // Obtener los valores seleccionados del evento
+        const options = event.target.options;
+        const selectedValues = [];
+        for (let i = 0; i < options.length; i++) {
+          if (options[i].selected) {
+            selectedValues.push(options[i].value);
+          }
+        }
+        // Actualizar el estado con los valores seleccionados
+        setUser({...user, [event.target.name]: selectedValues});
+      };
 
     async function saveInformation(e){
         e.preventDefault()
@@ -43,8 +57,6 @@ export const EditMyProfile = () => {
     useEffect( ()=>{
         actions.getSubcategories()
     },[])
-
-    console.log(store.subcategories)
 
     return(
         <div className="container">
@@ -72,13 +84,13 @@ export const EditMyProfile = () => {
                             <label htmlFor="profile_resume">Profile resume</label>
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="knowledge" className="form-label">Knowledge</label>
+                            <label htmlFor="knowledge" className="form-label">Tasks you can offer</label>
                             <select className="form-select" aria-label="Default select example" name="knowledge"
-                            onChange={handleChange} value={user.knowledge}>
+                            onChange={handleSubCategoryChange} value={user.knowledge} multiple>
                                 <option disabled value={''}>Select an option</option>
                                 {store.subcategories.map( (subcategory)=>{
                                     return(
-                                        <option key={subcategory.id} value={subcategory.name}>{subcategory.name}</option> 
+                                        <option key={subcategory.id} value={subcategory.id}>{subcategory.name}</option> 
                                     )
                                 })}                                             
                             </select>                            

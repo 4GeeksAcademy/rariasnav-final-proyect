@@ -33,7 +33,11 @@ export const Navbar = () => {
 							<ul className="dropdown-menu">								
 								<li><span className="dropdown-item" onClick={ ()=> navigate('/myProfile') }>My profile</span></li>
 								{store.loggedUser.role === 'client' &&
+								<>
 								<li><span className="dropdown-item" onClick={ ()=> navigate("/requestHistory") }>Requests</span></li>
+								<li><span className="dropdown-item" onClick={ ()=> navigate("/pendingRequests") }>Pending</span></li>
+								<li><span className="dropdown-item" onClick={ ()=> navigate("/requestsInProcess") }>In process</span></li>
+								</>
 								}
 								{store.loggedUser.role === 'vendor' &&
 								<>

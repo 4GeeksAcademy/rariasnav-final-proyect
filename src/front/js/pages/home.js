@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
-import rigoImageUrl from "../../img/rigo-baby.jpg";
 import "../../styles/home.css";
 
 export const Home = () => {
@@ -9,11 +8,21 @@ export const Home = () => {
 	const navigate = useNavigate()	
 	const [query, setQuery] = useState("")	
 	const [users, setUsers] = useState(store.test)
-	const [subcategories, setSubcategories] = useState(store.subcategories)	
+	const [subcategories, setSubcategories] = useState([])
 	
-	useEffect( ()=> {
-		setSubcategories(store.subcategories)
-	}, [store.subcategories] )	
+	const getRandomSubcategory = (array, num) =>{
+		const shuffled = array.slice();
+		for(let i = shuffled.length - 1; i > 0; i--){
+			const j = Math.floor(Math.random() * (i + 1));
+			[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+		}
+		return shuffled.slice(0, num)
+	}
+
+	useEffect( ()=>{
+		const selectedSubcategories = getRandomSubcategory(store.subcategories, 9)
+		setSubcategories(selectedSubcategories)
+	},[store.subcategories])	
 
 	useEffect( ()=> {
 		setUsers(store.test)
@@ -77,7 +86,7 @@ export const Home = () => {
 			<div className="album py-5 bg-body-tertiary">
     			<div className="container">
 					<div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-						{subcategories.sort( ()=> (Math.random() * 9)).map( (subcategory)=> {
+						{subcategories.map( (subcategory)=> {
 							return(
 								<div className="col" key={subcategory.id}>
 									<div className="card shadow-sm">

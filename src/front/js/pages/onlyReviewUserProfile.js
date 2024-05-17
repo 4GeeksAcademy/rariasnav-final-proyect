@@ -1,38 +1,36 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from "react";
 import { Context } from "../store/appContext";
-import { useNavigate, Navigate } from "react-router-dom";
 import "../../styles/home.css";
+import { useParams, Navigate } from "react-router-dom";
 
-export const GetInMyProfile = () =>{
-    const {store, actions} = useContext(Context)
-    const navigate = useNavigate()
-    const [userKnowledge, setUserKnowledge] = useState([])
-
-    const getUserKnowledge = (email, role) => {
-        if(role == 'vendor'){
-            return store.offerKnowledge.filter(offerKnown => offerKnown.user.email === email);
-        }
-    };
+export const OnlyReviewUserProfile = () => {
+    const {actions, store} = useContext(Context)
+    const {userId} = useParams()
+    const [user, setUser] = useState({})
 
     useEffect( ()=>{
-        actions.getOfferKnowedle()
+        actions.loadUserData()
     },[])
 
     useEffect( ()=>{
-        const getData = async() => {
-            if(store.loggedUser && store.loggedUser.email){
-                const knowledge = await getUserKnowledge(store.loggedUser.email, store.loggedUser.role)
-                setUserKnowledge(knowledge)
-            }
+        const findUser = () =>{
+            let result = store.users.find( (user)=> user.id == parseInt(userId) )
+            setUser(result)
         }
-        getData()   
-    },[store.offerKnowledge, store.loggedUser])
+        findUser()
+    },[userId])
+
+    useEffect( ()=>{
+        actions.getOfferKnowedle()
+    }, [])
+
+    console.log(store.offerKnowledge)
 
     return(
         <div className="container">
-            {store.loggedUser == false && <Navigate to='/loginRegisterPreview'/>}  
-            {store.loggedUser && 
-            <div className="body">
+            {user == null && <Navigate to='/pendingRequests'/>}
+            {user && 
+                <div className="body">
                 <div className="Portrait">
                     <div className="body text-center">
                         <div className="container">
@@ -52,14 +50,8 @@ export const GetInMyProfile = () =>{
                         <div className="col-md-9">
                             <div className="Profiletitle">
                                 <div className="d-inline">
-                                    <h1>{store.loggedUser.full_name}</h1>
-                                    <button type="button" className="btn btn-light" onClick={ ()=>navigate('/editMyProfile') }><i className="fa-solid fa-gear"></i></button>
-                                </div>
-                                                        
-                                <div className="row">
-                                    <h5 className="col-md-4">{store.loggedUser.knowledge}</h5>
-                                    <h5 className="col-md-4">{store.loggedUser.knowledge}</h5>
-                                </div>
+                                    <h1>{user.full_name}</h1>
+                                </div>                                                
                             </div>                        
                         </div>                       
                     </div>
@@ -68,29 +60,29 @@ export const GetInMyProfile = () =>{
                 <div className="ProfileResume mb-3 mt-5">
                     <div className="body">
                         <div className="container">
-                            <p>{store.loggedUser.profile_resume}</p>
+                            <p>{user.profile_resume}</p>
                         </div> 
                     </div>  
                 </div>
                 <div className="ProfileMoreInfo m-5">
                     <div className="body row m-5">                    
                             <div className="col-md-6 col-sm-12">
-                                <p>Birth date: {store.loggedUser.date_of_birth}</p>
-                                <p>Gender: {store.loggedUser.gender}</p>
-                                {store.loggedUser.role == 'vendor' && (
+                                <p>Birth date:{user.birth_date}</p>
+                                <p>Gender: {user.gender}</p>
+                                {/* {store.loggedUser.role === 'vendor' &&
                                     <div className="dropdown">
                                         <button className="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                             I can offer to you...
                                         </button>
                                         <ul className="dropdown-menu dropdownKnowledge">
-                                            {userKnowledge.map( (filteredKnowledge)=>{
+                                            {store.offerKnowledge.filter( offerKnown => offerKnown.user.email === store.loggedUser.email).map( (filteredKnowledge)=>{
                                                 return(                                        
                                                     <li className="dropdown-item" key={filteredKnowledge.id}>{filteredKnowledge.knowledge.description}</li>
                                                 )
                                             })}                         
                                         </ul>
                                     </div>
-                                )}                                
+                                }                                 */}
                             </div>
                             <div className="card col-md-6 col-sm-12">
                                 <div className="card text-bg-dark" style={{height: "6rem"}}>
@@ -103,7 +95,8 @@ export const GetInMyProfile = () =>{
                     </div>
                 </div> 
             </div> 
-            }                       
-        </div>   
+            }
+                                
+        </div>
     )
 }

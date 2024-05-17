@@ -19,3 +19,8 @@
 .cardTest{
     min-width: 12rem
 }
+
+.dropdownKnowledge{
+    max-height: 200px;
+    overflow-y: scroll;
+}

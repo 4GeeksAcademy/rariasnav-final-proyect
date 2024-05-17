@@ -3,6 +3,8 @@ import { Context } from "../store/appContext";
 import "../../styles/home.css";
 
 export const TakenRequests = () =>{
+    const {actions, store} = useContext(Context)
+    
     return(
         <div className="container">
             <div className="body m-5">

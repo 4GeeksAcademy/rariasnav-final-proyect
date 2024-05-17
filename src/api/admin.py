@@ -1,7 +1,7 @@
   
 import os
 from flask_admin import Admin
-from .models import db, User, PersonalDocument, ServiceCategory, ServiceSubCategory, ServiceCategorySubCategory, ServiceRequest, ServiceRequestOffer
+from .models import db, User, PersonalDocument, ServiceCategory, ServiceSubCategory, ServiceCategorySubCategory, ServiceRequest, ServiceRequestOffer, OfferKnowledge
 from flask_admin.contrib.sqla import ModelView
 
 def setup_admin(app):
@@ -19,6 +19,7 @@ def setup_admin(app):
     admin.add_view(ModelView(ServiceCategorySubCategory, db.session))
     admin.add_view(ModelView(ServiceRequest, db.session))
     admin.add_view(ModelView(ServiceRequestOffer, db.session))
+    admin.add_view(ModelView(OfferKnowledge, db.session))
 
     # You can duplicate that line to add mew models
     # admin.add_view(ModelView(YourModelName, db.session))

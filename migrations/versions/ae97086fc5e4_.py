@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: bff8ddc13e85
+Revision ID: ae97086fc5e4
 Revises: 
-Create Date: 2024-05-08 22:37:08.205418
+Create Date: 2024-05-11 12:38:46.332469
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'bff8ddc13e85'
+revision = 'ae97086fc5e4'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -48,11 +48,18 @@ def upgrade():
     sa.Column('profile_resume', sa.String(length=350), nullable=True),
     sa.Column('role', sa.Enum('client', 'vendor', name='roles'), nullable=False),
     sa.Column('gender', sa.Enum('non_binary', 'female', 'male', name='choosegender'), nullable=True),
-    sa.Column('knowledge', sa.String(length=120), nullable=True),
     sa.Column('nationality', sa.String(length=120), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('phone_number')
+    )
+    op.create_table('offerknowledge',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('service_subcategory_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['service_subcategory_id'], ['servicesubcategory.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('personaldocument',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -106,6 +113,7 @@ def downgrade():
     op.drop_table('servicerequest')
     op.drop_table('servicecategorysubcategory')
     op.drop_table('personaldocument')
+    op.drop_table('offerknowledge')
     op.drop_table('user')
     op.drop_table('servicesubcategory')
     op.drop_table('servicecategory')

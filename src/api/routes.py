@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint, current_app
-from api.models import db, User, PersonalDocument, ServiceCategory, ServiceSubCategory, ServiceCategorySubCategory, ServiceRequest, ServiceRequestOffer
+from api.models import db, User, PersonalDocument, ServiceCategory, ServiceSubCategory, ServiceCategorySubCategory, ServiceRequest, ServiceRequestOffer, OfferKnowledge
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -129,11 +129,18 @@ def fill_user_information():
     email = get_jwt_identity()
     body = request.get_json()  
     user = User.query.filter_by(email=email).first()
-    
+        
     for key in body:
         for col in user.serialize():
             if key == col and key != "id":
                 setattr(user, col, body[key])
+
+    if "knowledge" in body:
+        for subcategory_id in body['knowledge']:
+            subcategory_exist = OfferKnowledge.query.filter_by(user_id=user.id, service_subcategory_id=subcategory_id).first()
+            if not subcategory_exist:
+                new_offer_knowledge = OfferKnowledge(user_id=user.id, service_subcategory_id=subcategory_id)
+                db.session.add(new_offer_knowledge)
 
     db.session.commit()
     
@@ -307,9 +314,7 @@ def get_service_request(service_request_id):
 @api.route('/service_request', methods=['POST'])
 @jwt_required()
 def add_service_request():
-    body = request.get_json()
-    email = body['email']
-    print('this email', email)    
+    body = request.get_json()    
     service_subcategory_id = ServiceSubCategory.query.get(body['service_subcategory_id'])
     if not service_subcategory_id:
         return jsonify({"msg": "Service id not valid"}), 400 
@@ -350,3 +355,72 @@ def get_all_service_request_offer():
     result = list(map(lambda service_request_offer: service_request_offer.serialize() ,service_request_offers))
 
     return jsonify(result), 200
+
+@api.route('/service_request_offer', methods=['POST'])
+@jwt_required()
+def add_service_request_offer():
+    body = request.get_json()
+    service_request_id = ServiceRequest.query.get(body['service_request_id'])
+    if not service_request_id:
+        return jsonify({"msg": "Service request id not valid"}), 400 
+    
+    vendor_user = User.query.filter_by(email=body['vendor_email']).first()
+
+    if not vendor_user:
+         return jsonify({"msg": "Vendor user error"}), 400 
+    client_user = User.query.filter_by(email=body['client_email']).first()
+
+    if vendor_user:    
+        service_request_offer = ServiceRequestOffer(
+            rate = body['rate'],
+            status = body['status'],
+            service_request_id = body['service_request_id'],
+            user_client_id = client_user.id,
+            user_vendor_id = vendor_user.id
+        ) 
+        db.session.add(service_request_offer)
+        db.session.commit()
+
+        return jsonify({"msg": "Service request offer added"}), 200
+    else:
+        return jsonify({"msg": "Email not valid"}), 400
+
+@api.route('/offer_knowledge', methods=['GET'])
+@jwt_required()
+def get_all_known_offers():
+    email = get_jwt_identity() 
+    
+    user = User.query.filter_by(email=email).first()
+    if user is None:
+        return jsonify({ 'msg': 'Email not in system' }), 401
+
+    if user:    
+        offer_knowledge = OfferKnowledge.query.filter_by(user_id=user.id).all()
+        result = list(map(lambda offer: offer.serialize() ,offer_knowledge))
+        return jsonify(result), 200
+    
+@api.route('/service_request_offer/<int:service_request_offer_id>/<int:service_request_id>', methods=['PUT'])
+@jwt_required()
+def update_service_request_offer(service_request_offer_id,service_request_id):
+    email = get_jwt_identity()
+    body = request.get_json()
+
+    user = User.query.filter_by(email=email).first()
+    if user is None:
+        return jsonify({ 'msg': 'Email not in system' }), 401
+    
+    service_request = ServiceRequest.query.filter_by(id=service_request_id).first()
+    if service_request is None:
+        return jsonify({ 'msg': 'Service request does not exist' }), 401
+    
+    service_request_offer = ServiceRequestOffer.query.filter_by(id=service_request_offer_id).first()
+    if service_request_offer is None:
+        return jsonify({ 'msg': 'Service request offer does not exist' }), 401
+    
+    if user and service_request_offer:
+        service_request.status = body["service_request_status"]
+        service_request_offer.status = body["service_request_offer_status"]
+
+        db.session.commit()
+
+        return jsonify({ 'msg': 'Service request offer updated' }), 200

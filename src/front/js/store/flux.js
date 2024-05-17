@@ -21,7 +21,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 			categories: [],
 			subcategories: [],
 			categoriesSubcategories: [],
-			servicesRequests: []
+			servicesRequests: [],
+			servicesRequestsOffers: [],
+			offerKnowledge: []
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -214,11 +216,15 @@ const getState = ({ getStore, getActions, setStore }) => {
 			postForAService: async (service_request)=>{
 				const store = getStore()
 				const actions = getActions()
+				const newData = {
+					"email": store.loggedUser.email,
+					...service_request
+				}
 				try {
 					const requestOptions = {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/JSON', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-						body: JSON.stringify(service_request)
+						body: JSON.stringify(newData)
 					}
 					const response = await fetch(`${store.baseURL}/service_request`, requestOptions)
 					if( response.ok ){
@@ -263,6 +269,88 @@ const getState = ({ getStore, getActions, setStore }) => {
 						actions.getServicesRequests()
 						return 201
 					}
+				} catch (error) {
+					
+				}
+			},
+			offerServiceRequest: async (data, requestServiceOffer)=>{
+				const store = getStore()
+				const actions = getActions()
+				const newData = {
+					"vendor_email": store.loggedUser.email,
+					...data,
+					...requestServiceOffer
+				}				 				 												
+				try {
+					const requestOptions = {
+						method: 'POST',
+						headers: {'Content-Type':'application/JSON', 'Authorization': `Bearer ${localStorage.getItem('token')}`},
+						body: JSON.stringify(newData)
+					}
+					const response = await fetch(`${store.baseURL}/service_request_offer`, requestOptions)
+					if(response.ok){
+						actions.loadUserData()
+						actions.getServicesRequests()
+						return 201
+					}
+					
+				} catch (error) {
+					
+				}
+			},
+			getServicesRequestsOffers: async ()=>{
+				const store = getStore()
+				const actions = getActions()
+				try {
+					const requestOptions = {
+						method: 'GET',
+						headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}
+					}
+					const response = await fetch(`${store.baseURL}/service_request_offer`, requestOptions)
+					const data = await response.json()
+
+					if( response.ok ){
+						setStore({ servicesRequestsOffers: data })
+					}
+				} catch (error) {
+					
+				}
+			},
+			getOfferKnowedle: async ()=>{
+				const store = getStore()
+				const actions = getActions()
+				try {
+					const requestOptions = {
+						method: 'GET',
+						headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}
+					}
+					const response = await fetch(`${store.baseURL}/offer_knowledge`, requestOptions)
+					const data = await response.json()
+					
+					if( response.ok ){
+						setStore({ offerKnowledge: data})
+					}
+				} catch (error) {
+					
+				}
+			},
+			updateServicesRequestsOffers: async (index,data)=>{
+				const store = getStore()
+				const actions = getActions()
+				try {
+					const requestOptions = {
+						method: 'PUT',
+						headers: {'Content-Type':'application/JSON', 'Authorization': `Bearer ${localStorage.getItem('token')}`},
+						body: JSON.stringify(data)
+					}
+					const response = await fetch(`${store.baseURL}/service_request_offer/${index.service_request}/${index.service_request_offer}`, requestOptions)
+
+					if(response.ok){
+						actions.getServicesRequests()
+						actions.getServicesRequestsOffers()
+						return 201
+					}
+					
 				} catch (error) {
 					
 				}

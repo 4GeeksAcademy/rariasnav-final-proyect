@@ -25,11 +25,11 @@ class User(db.Model):
     profile_resume = db.Column(db.String(350), unique=False, nullable=True)
     role = db.Column(db.Enum(Roles), unique=False, nullable=False)
     gender = db.Column(db.Enum(ChooseGender), unique=False, nullable=True)
-    knowledge = db.Column(db.String(120), unique=False, nullable=True)
     personal_document = db.relationship('PersonalDocument', backref='user', lazy=True)       
     # nationality_id = db.Column(db.Integer, db.ForeignKey('country.id'), nullable=True)
     nationality = db.Column(db.String(120), unique=False, nullable=True)
     service_request = db.relationship('ServiceRequest', backref='user', lazy=True) 
+    offer_knowledge = db.relationship('OfferKnowledge', backref='user', lazy=True) 
     service_request_offer = db.relationship('ServiceRequestOffer', uselist=True, backref='user', foreign_keys='ServiceRequestOffer.user_client_id', lazy=True)
     service_request_offer = db.relationship('ServiceRequestOffer', uselist=True, backref='user', foreign_keys='ServiceRequestOffer.user_vendor_id', lazy=True)
 
@@ -54,7 +54,6 @@ class User(db.Model):
             "address": self.address,
             "role": self.role.name,
             "gender": self.gender.name,
-            "knowledge": self.knowledge,
             "profile_resume": self.profile_resume,
             "personal_documents": personal_documents,
             "nationality": self.nationality
@@ -128,6 +127,7 @@ class ServiceSubCategory(db.Model):
     description = db.Column(db.String(250), unique=False, nullable=False)
     service_category_subcategory = db.relationship('ServiceCategorySubCategory', backref='servicesubcategory', lazy=True) 
     service_request = db.relationship('ServiceRequest', backref='servicesubcategory', lazy=True)
+    offer_knowledge = db.relationship('OfferKnowledge', backref='servicesubcategory', lazy=True)
     
     def __repr__(self):
         return f'<ServiceSubCategory {self.name}>'
@@ -222,11 +222,47 @@ class ServiceRequestOffer(db.Model):
         return f'<ServiceRequestOffer {self.id}>'
     
     def serialize(self):
+        service_request_id = ServiceRequest.query.get(self.service_request_id)
+        if service_request_id is not None:
+            service_request_id = service_request_id.serialize()
+
+        user_client_id = User.query.get(self.user_client_id)
+        if user_client_id is not None:
+            user_client_id = user_client_id.serialize()
+
+        user_vendor_id = User.query.get(self.user_vendor_id)
+        if user_vendor_id is not None:
+            user_vendor_id = user_vendor_id.serialize()
+
         return{
             "id": self.id,
-            "service_request_id": self.service_request_id,
+            "service_request_id": service_request_id,
             "status": self.status.name,
-            "user_client_id": self.user_client_id,
-            "user_vendor_id": self.user_vendor_id,
+            "user_client_id": user_client_id,
+            "user_vendor_id": user_vendor_id,
             "rate": self.rate
+        }
+
+class OfferKnowledge(db.Model):
+    __tablename__ = 'offerknowledge'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    service_subcategory_id = db.Column(db.Integer, db.ForeignKey('servicesubcategory.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<OfferKnowledge {self.id}>'
+
+    def serialize(self):
+        knowledge = ServiceSubCategory.query.get(self.service_subcategory_id)
+        if knowledge is not None:
+            knowledge = knowledge.serialize() 
+
+        user = User.query.get(self.user_id)
+        if user is not None:
+            user = user.serialize()       
+        
+        return {
+            "id": self.id,
+            "knowledge": knowledge,
+            "user": user
         }

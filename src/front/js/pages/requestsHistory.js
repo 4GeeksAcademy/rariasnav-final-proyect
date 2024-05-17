@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../store/appContext";
-import { useNavigate } from "react-router-dom";
 import "../../styles/home.css";
 
 export const RequestsHistory = () => {
     const {store, actions} = useContext(Context)
+    const servicesRequestByUser = store.servicesRequests.filter( serviceRequest => serviceRequest.user.email === store.loggedUser.email)
 
     useEffect( ()=>{
         actions.getServicesRequests()
@@ -24,8 +24,8 @@ export const RequestsHistory = () => {
                 </div>
                 <div className="list-group">
                     <h3 className=" ">Active requests</h3>
-                    {store.servicesRequests.filter( serviceRequest => serviceRequest.user.email === store.loggedUser.email).map( (filteredServiceRequest)=>{
-                        if(filteredServiceRequest.is_active == true){
+                    {servicesRequestByUser.map( (filteredServiceRequest)=>{
+                        if(filteredServiceRequest.is_active == true && filteredServiceRequest.status === 'pending'){
                             return(                          
                                 <div className="list-group-item mb-3" key={filteredServiceRequest.id}>
                                     <div className="d-flex justify-content-between">

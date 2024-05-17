@@ -16,6 +16,9 @@ import { PostForAService } from "./pages/postForAService";
 import { RequestsHistory } from "./pages/requestsHistory";
 import { AvailableRequests } from "./pages/availableRequests";
 import { TakenRequests } from "./pages/takenRequests";
+import { PendingForApprovalRequests } from "./pages/pendingForApprovalRequests";
+import { RequestsServicesInProcess } from "./pages/requestsSerivicesInProcess";
+import { OnlyReviewUserProfile } from "./pages/onlyReviewUserProfile";
 
 import injectContext from "./store/appContext";
 
@@ -51,6 +54,9 @@ const Layout = () => {
                         <Route element={<RequestsHistory />} path="/requestHistory" />
                         <Route element={<AvailableRequests />} path="/availableRequests" />
                         <Route element={<TakenRequests />} path="/takenRequests" />
+                        <Route element={<PendingForApprovalRequests />} path="/pendingRequests" />
+                        <Route element={<RequestsServicesInProcess />} path="/requestsInProcess"  />
+                        <Route element={<OnlyReviewUserProfile />} path="/reviewProfile/:userId" />
                     </Routes>
                     <Footer />
                 </ScrollToTop>
