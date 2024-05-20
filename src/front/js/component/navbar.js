@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 
@@ -33,24 +33,23 @@ export const Navbar = () => {
 							<ul className="dropdown-menu">								
 								<li><span className="dropdown-item" onClick={ ()=> navigate('/myProfile') }>My profile</span></li>
 								{store.loggedUser.role === 'client' &&
-								<>
+								<div>
 								<li><span className="dropdown-item" onClick={ ()=> navigate("/requestHistory") }>Requests</span></li>
 								<li><span className="dropdown-item" onClick={ ()=> navigate("/pendingRequests") }>Pending</span></li>
 								<li><span className="dropdown-item" onClick={ ()=> navigate("/requestsInProcess") }>In process</span></li>
-								</>
+								</div>
 								}
 								{store.loggedUser.role === 'vendor' &&
-								<>
+								<div>
 								<li><span className="dropdown-item" onClick={ ()=> navigate("/availableRequests") }>Available requests</span></li>
 								<li><span className="dropdown-item" onClick={ ()=> navigate("/takenRequests") }>Taken requests</span></li>
-								</>
+								</div>
 								}
-								<li><span className="dropdown-item" onClick={ ()=> handleLogout() }>Logout</span></li>
-								
+								<li><span className="dropdown-item" onClick={ ()=> handleLogout() }>Logout</span></li>								
 							</ul>
 						</div>
-					</div>}
-										
+					</div>
+					}										
 				</div>
 			</div>
 		</nav>

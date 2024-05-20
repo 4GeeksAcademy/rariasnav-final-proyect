@@ -6,19 +6,16 @@ import "../../styles/home.css";
 export const AvailableRequests = () =>{
     const {actions, store} = useContext(Context)
     const navigate = useNavigate()
-    //filters available and pending requests
-    const requests = store.servicesRequests.filter( serviceRequest => serviceRequest.is_active === true && serviceRequest.status === 'pending')
-    //brings the subcategories the vendor has knowledge
-    const userKnowledge = store.offerKnowledge.map( (known)=> known.knowledge.description )
-    //filters the available requests by vendor knowledge
-    const filteredRequests = requests.filter( request => userKnowledge.includes(request.service_subcategory_id.description) )
+    const [requests, setRequests] = useState([])   
+    const [knowledge, setKnowledge] = useState([])    
+    const [activePendingRequests, setActivePendingRequests] = useState([])      
+    const [userKnowledge, setUserKnowledge] = useState([])
+    const [filteredRequests, setFilteredRequests] = useState([])
     const [requestServiceOffer, setRequestServiceOffer] = useState({
         "status": "pending",
         "rate": " "
     })
-    const [tempData, setTempData] = useState()
-
-    
+    const [tempData, setTempData] = useState()    
 
     async function sendData(data){    
         const result = await actions.offerServiceRequest(data, requestServiceOffer)
@@ -34,12 +31,38 @@ export const AvailableRequests = () =>{
     }
 
     useEffect( ()=>{
-        actions.getOfferKnowedle()
+        const getData = async () => {
+            const response = await actions.getServicesRequests()
+            if(response){
+                setRequests(response)
+            }
+        } 
+        getData()        
     },[])
 
     useEffect( ()=>{
-        actions.getServicesRequests()
+        const getData = async () => {
+            const response = await actions.getOfferKnowedle()
+            if(response){
+                setKnowledge(response)
+            }
+        } 
+        getData()        
     },[])
+
+    useEffect( ()=> {
+		setActivePendingRequests(requests.filter( serviceRequest => serviceRequest.is_active === true && serviceRequest.status === 'pending'))
+	}, [requests])
+
+    useEffect( ()=> {
+		setUserKnowledge(knowledge.map( (known)=> known.knowledge.description ))
+	}, [knowledge])
+
+    useEffect( ()=> {
+        if(activePendingRequests.length > 0 && userKnowledge.length > 0){
+            setFilteredRequests(activePendingRequests.filter( request => userKnowledge.includes(request.service_subcategory_id.description) ))
+        }		
+	}, [activePendingRequests, userKnowledge])
 
     return(
         <div className="container">

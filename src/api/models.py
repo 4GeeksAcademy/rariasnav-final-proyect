@@ -58,6 +58,14 @@ class User(db.Model):
             "personal_documents": personal_documents,
             "nationality": self.nationality
         }
+    def serialize_vendor_knowledge(self):
+        knowledge = OfferKnowledge.query.filter_by(user_id=self.id).first()
+        if knowledge is not None:
+            knowledge = knowledge.serialize_client()
+        return {
+            'user': self.serialize(),
+            'knowledge': knowledge
+        }    
     
 # class Country(db.Model):
 #     __tablename__ = 'country'
@@ -265,4 +273,12 @@ class OfferKnowledge(db.Model):
             "id": self.id,
             "knowledge": knowledge,
             "user": user
+        }
+    def serialize_client(self):
+        knowledge = ServiceSubCategory.query.get(self.service_subcategory_id)
+        if knowledge is not None:
+            knowledge = knowledge.serialize() 
+        return {
+            "id": self.id,
+            "knowledge": knowledge
         }

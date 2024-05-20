@@ -7,7 +7,6 @@ export const PostForAService = () => {
     const {actions, store} = useContext(Context)
     const navigate = useNavigate()
     const {serviceSubcategoryId} = useParams()
-    const user = store.loggedUser
     const [service_request, setServiceRequest] = useState({
         "address": " ",
         "description": " ",
@@ -15,13 +14,6 @@ export const PostForAService = () => {
         "moving": " ",
         "service_subcategory_id": serviceSubcategoryId
     })
-
-    useEffect( ()=>{
-        if(!store.loggedUser){
-            navigate('/loginRegisterPreview')
-        }
-    },[])
-
     async function saveServiceRequest(e){
         e.preventDefault()
         const result = await actions.postForAService(service_request)
@@ -36,15 +28,31 @@ export const PostForAService = () => {
         })
     }
 
+    useEffect( ()=>{
+        if(store.loggedUser && store.loggedUser.role === 'vendor'){
+            navigate('/')
+        }
+    },[store.loggedUser])
+
     // useEffect( ()=>{
-    //     if(store.loggedUser.role === 'vendor'){
-    //         navigate('/')
+    //     if(!store.loggedUser){
+    //         navigate('/loginRegisterPreview')
     //     }
     // },[])
 
     return(
-        <div className="Container"> 
-            {store.loggedUser.role != 'client' && <Navigate to='/'/>}            
+        <div className="Container">
+            {store.loggedUser == false &&
+                <div className="body m-5">
+                    <div className="text-center ">
+                        <h2 className="">Still don´t have an account?</h2>
+                        <p><a href="" onClick={ ()=>navigate('/signUp') }>Create an account</a></p>
+                    </div> 
+                    <div className="text-center ">
+                        <h5 className="">I have an account ... <a className="link-offset-2 link-underline link-underline-opacity-0" href="" onClick={ ()=>navigate('/login') } style={{textDecoration: "none"}}>login</a></h5>
+                    </div>
+                </div> 
+                }          
             {store.loggedUser && store.loggedUser.role === 'client' &&
             <div className="body m-5">
                 <div className="text-center ">

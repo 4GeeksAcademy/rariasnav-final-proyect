@@ -7,24 +7,18 @@ export const OnlyReviewUserProfile = () => {
     const {actions, store} = useContext(Context)
     const {userId} = useParams()
     const [user, setUser] = useState({})
+    const [userKnowlegge, setUserKnowledge] = useState([])
 
     useEffect( ()=>{
-        actions.loadUserData()
-    },[])
-
-    useEffect( ()=>{
-        const findUser = () =>{
-            let result = store.users.find( (user)=> user.id == parseInt(userId) )
-            setUser(result)
-        }
-        findUser()
+        const getData = async () => {
+            const response = await actions.loadUserDataById(userId)
+            if(response){
+                setUser(response.user)
+                setUserKnowledge(response.knowledge)
+            }
+        } 
+        getData()        
     },[userId])
-
-    useEffect( ()=>{
-        actions.getOfferKnowedle()
-    }, [])
-
-    console.log(store.offerKnowledge)
 
     return(
         <div className="container">
@@ -69,20 +63,20 @@ export const OnlyReviewUserProfile = () => {
                             <div className="col-md-6 col-sm-12">
                                 <p>Birth date:{user.birth_date}</p>
                                 <p>Gender: {user.gender}</p>
-                                {/* {store.loggedUser.role === 'vendor' &&
+                                {user.role === 'vendor' &&
                                     <div className="dropdown">
                                         <button className="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                             I can offer to you...
                                         </button>
                                         <ul className="dropdown-menu dropdownKnowledge">
-                                            {store.offerKnowledge.filter( offerKnown => offerKnown.user.email === store.loggedUser.email).map( (filteredKnowledge)=>{
+                                            {userKnowlegge.map( (known, index)=>{
                                                 return(                                        
-                                                    <li className="dropdown-item" key={filteredKnowledge.id}>{filteredKnowledge.knowledge.description}</li>
+                                                    <li className="dropdown-item" key={index}>{known.knowledge.description}</li>
                                                 )
                                             })}                         
                                         </ul>
                                     </div>
-                                }                                 */}
+                                }
                             </div>
                             <div className="card col-md-6 col-sm-12">
                                 <div className="card text-bg-dark" style={{height: "6rem"}}>

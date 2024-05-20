@@ -7,8 +7,10 @@ export const Home = () => {
 	const { store, actions } = useContext(Context);
 	const navigate = useNavigate()	
 	const [query, setQuery] = useState("")	
-	const [users, setUsers] = useState(store.test)
+	const [users, setUsers] = useState([])
+	const [categories, setCategories] = useState([])
 	const [subcategories, setSubcategories] = useState([])
+	const [displaySubcategories, setDisplaySubcategories] = useState([])
 	
 	const getRandomSubcategory = (array, num) =>{
 		const shuffled = array.slice();
@@ -20,26 +22,44 @@ export const Home = () => {
 	}
 
 	useEffect( ()=>{
-		const selectedSubcategories = getRandomSubcategory(store.subcategories, 9)
-		setSubcategories(selectedSubcategories)
-	},[store.subcategories])	
-
-	useEffect( ()=> {
-		setUsers(store.test)
-	}, [store.test] )
-
-	useEffect( ()=> {
-		setUsers(store.test.filter( (item) => item.name.toLowerCase().includes(query) ))
-	}, [query] )
-	
-	useEffect( ()=>{
-        actions.getCategories()
-    },[])	
-
-	useEffect( ()=>{
-        actions.getSubcategories()
+        const getData = async () => {
+            const response = await actions.loadTestData()
+            if(response){
+                setUsers(response)
+            }
+        } 
+        getData()        
     },[])
-	
+
+	useEffect( ()=>{
+        const getData = async () => {
+            const response = await actions.getCategories()
+            if(response){
+                setCategories(response)
+            }
+        } 
+        getData()        
+    },[])
+
+	useEffect( ()=>{
+        const getData = async () => {
+            const response = await actions.getSubcategories()
+            if(response){
+                setSubcategories(response)
+            }
+        } 
+        getData()        
+    },[])
+
+	useEffect( ()=>{
+		const selectedSubcategories = getRandomSubcategory(subcategories, 9)
+		setDisplaySubcategories(selectedSubcategories)
+	},[subcategories])	
+
+	useEffect( ()=> {
+		setUsers(users.filter( (item) => item.name.toLowerCase().includes(query) ))
+	}, [query] )
+
 	return (
 		<div className="Container m-5">
 			<div className="Jumbotron">
@@ -69,7 +89,7 @@ export const Home = () => {
 			</div>
 
 			<div className="button-group row m-5 text-center">
-				{store.categories.map( (category)=> {
+				{categories.map( (category)=> {
 					return(
 						<button className="button-group btn btn-outline-dark text-center m-auto border border-0" style={{width: "auto"}}
 						onClick={ ()=>navigate('/demo') } key={category.id}>
@@ -86,7 +106,7 @@ export const Home = () => {
 			<div className="album py-5 bg-body-tertiary">
     			<div className="container">
 					<div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-						{subcategories.map( (subcategory)=> {
+						{displaySubcategories.map( (subcategory)=> {
 							return(
 								<div className="col" key={subcategory.id}>
 									<div className="card shadow-sm">

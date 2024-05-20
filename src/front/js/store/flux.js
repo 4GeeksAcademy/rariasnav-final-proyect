@@ -15,15 +15,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			],
 			baseURL : 'https://legendary-tribble-97999g966jjxh47v-3001.app.github.dev/api',
-			users: [],		
-			loggedUser: null,
-			test: [],
-			categories: [],
-			subcategories: [],
-			categoriesSubcategories: [],
-			servicesRequests: [],
-			servicesRequestsOffers: [],
-			offerKnowledge: []
+			loggedUser: null
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -57,17 +49,18 @@ const getState = ({ getStore, getActions, setStore }) => {
 				//reset the global store
 				setStore({ demo: demo });
 			},
-			loadUserData: async () => {
+			loadUserDataById: async (id) => {
 				const store = getStore()
 				try {
-					const response = await fetch(`${store.baseURL}/user`)
+					const response = await fetch(`${store.baseURL}/user/${id}`)
 					const data = await response.json()
 
 					if( response.ok ){
-						setStore({ users: data })
+						return data
 					}
+					return false
 				} catch (error) {
-					
+					return false
 				}
 			},
 			createUser: async (user) => {				
@@ -82,7 +75,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const response = await fetch(`${store.baseURL}/signup`, requestOptions)					
 
 					if(response.ok){
-						actions.loadUserData()
 						return 201
 					}
 				} catch (error) {
@@ -167,11 +159,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const data = await response.json()
 
 					if(response.ok){
-						
-						setStore({ test: data})
+						return data
 					}
+					return false
 				} catch (error) {
-					
+					return false
 				}
 			},
 			getCategories: async ()=> {
@@ -181,10 +173,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const data = await response.json()
 
 					if( response.ok ){
-						setStore({ categories: data })
+						return data
 					}
+					return false
 				} catch (error) {
-					
+					return false
 				}
 			},
 			getSubcategories: async ()=>{
@@ -194,10 +187,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const data = await response.json()
 
 					if( response.ok ){
-						setStore({ subcategories: data })
-					}					
+						return data
+					}
+					return false					
 				} catch (error) {
-					
+					return false
 				}
 			},
 			getCategoriesSubcategories: async ()=>{
@@ -207,10 +201,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const data = await response.json()
 
 					if( response.ok ){
-						setStore({ categoriesSubcategories: data })
-					}					
+						return data
+					}				
+					return false	
 				} catch (error) {
-					
+					return false
 				}
 			},
 			postForAService: async (service_request)=>{
@@ -228,7 +223,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 					}
 					const response = await fetch(`${store.baseURL}/service_request`, requestOptions)
 					if( response.ok ){
-						actions.loadUserData()
 						return 201
 					}
 					
@@ -247,13 +241,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 					}
 					const response = await fetch(`${store.baseURL}/service_request`, requestOptions)
 					const data = await response.json()
-					
+
 					if(response.ok){
-						setStore({ servicesRequests: data })
+						return data
 					}
+					return false
 				} 
 				catch (error) {
-					
+					return false
 				}
 			},
 			cancelServiceRequest: async (filteredServiceRequestId)=>{
@@ -289,7 +284,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 					}
 					const response = await fetch(`${store.baseURL}/service_request_offer`, requestOptions)
 					if(response.ok){
-						actions.loadUserData()
 						actions.getServicesRequests()
 						return 201
 					}
@@ -310,10 +304,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const data = await response.json()
 
 					if( response.ok ){
-						setStore({ servicesRequestsOffers: data })
+						return data
 					}
+					return false
 				} catch (error) {
-					
+					return false
 				}
 			},
 			getOfferKnowedle: async ()=>{
@@ -328,10 +323,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const data = await response.json()
 					
 					if( response.ok ){
-						setStore({ offerKnowledge: data})
+						return data
 					}
+					return false
 				} catch (error) {
-					
+					return false
 				}
 			},
 			updateServicesRequestsOffers: async (index,data)=>{

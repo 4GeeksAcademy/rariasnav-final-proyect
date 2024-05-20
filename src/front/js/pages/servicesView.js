@@ -5,13 +5,27 @@ import "../../styles/home.css";
 
 export const ServicesView = () => {
     const {store, actions} = useContext(Context)
-    
-    useEffect( ()=>{
-        actions.getCategories()
-    },[])    
+    const [categories, setCategories] = useState([])
+    const [categoriesSubcategories, setCategoriesSubcategories] = useState([])
 
     useEffect( ()=>{
-        actions.getCategoriesSubcategories()
+        const getData = async () =>{
+            const response = await actions.getCategories()
+            if(response){
+                setCategories(response)
+            }
+        }
+        getData()
+    },[])
+
+    useEffect( ()=>{
+        const getData = async () =>{
+            const  response = await actions.getCategoriesSubcategories()
+            if(response){
+                setCategoriesSubcategories(response)
+            }
+        }   
+        getData()     
     },[])
     
     return(
@@ -20,7 +34,7 @@ export const ServicesView = () => {
     			<div className="container">
 
 					<div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-                        {store.categories.map( (category)=> {
+                        {categories.map( (category)=> {
                             return(
                                 <div className="col" key={category.id}>
                                     <div className="card" style={{width:"100%", height:"225"}} >
@@ -30,7 +44,7 @@ export const ServicesView = () => {
                                             <p className="card-text">{category.description}</p>
                                         </div>
                                         <ul className="list-group list-group-flush">
-                                            {store.categoriesSubcategories.filter( categorySubcategory => categorySubcategory.service_category.name === category.name ).map( (filteredCategorySubcategory)=> {
+                                            {categoriesSubcategories.filter( categorySubcategory => categorySubcategory.service_category.name === category.name ).map( (filteredCategorySubcategory)=> {
                                                 return(
                                                     <li className="list-group-item" key={filteredCategorySubcategory.id}>
                                                         <a href="#" className="card-link">{filteredCategorySubcategory.service_subcategory.name}</a>

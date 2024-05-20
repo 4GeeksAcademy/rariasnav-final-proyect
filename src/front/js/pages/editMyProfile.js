@@ -6,7 +6,7 @@ import "../../styles/home.css";
 export const EditMyProfile = () => {
     const {store, actions} = useContext(Context)
     const navigate = useNavigate()
-
+    const [subcategory, setSubcategory] = useState([])
     const [user, setUser] = useState({
         "full_name": "",
         "date_of_birth": "",
@@ -55,7 +55,13 @@ export const EditMyProfile = () => {
     },[store.loggedUser] )
 
     useEffect( ()=>{
-        actions.getSubcategories()
+        const getData = async () => {
+            const response = await actions.getSubcategories()
+            if(response){
+                setSubcategory(response)
+            }
+        } 
+        getData()        
     },[])
 
     return(
@@ -88,9 +94,9 @@ export const EditMyProfile = () => {
                             <select className="form-select" aria-label="Default select example" name="knowledge"
                             onChange={handleSubCategoryChange} value={user.knowledge} multiple>
                                 <option disabled value={''}>Select an option</option>
-                                {store.subcategories.map( (subcategory)=>{
+                                {subcategory.map( (subcategory, index)=>{
                                     return(
-                                        <option key={subcategory.id} value={subcategory.id}>{subcategory.name}</option> 
+                                        <option key={index} value={subcategory.id}>{subcategory.name}</option> 
                                     )
                                 })}                                             
                             </select>                            

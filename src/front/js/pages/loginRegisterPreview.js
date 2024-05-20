@@ -1,10 +1,19 @@
-import React from "react";
+import React, {useContext, useEffect} from "react";
+import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 import "../../styles/home.css";
 
 export const LoginRegisterPreview = () => {
+    const {store, actions} = useContext(Context)
     const navigate = useNavigate()
+
+    useEffect( ()=>{
+        if(store.loggedUser){
+            navigate('/')
+        }
+    },[store.loggedUser, navigate])
     return(
+
         <div className="Container">
             <div className="body text-center m-5">
                 <div className="d-grid gap-2 m-auto" style={{width: "26rem"}}>

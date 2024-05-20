@@ -6,7 +6,8 @@ import "../../styles/home.css";
 export const PendingForApprovalRequests = () =>{
     const {actions, store} = useContext(Context)
     const navigate = useNavigate()
-    const [serviceRequestOffered, setServiceRequestOffered] = useState({})
+    const [serviceRequestOffered, setServiceRequestOffered] = useState([])
+    const [pendingdOffers, setPendingOffers] = useState([])
     const [offeredToMyUser, setOfferedToMyUser] = useState({})
     const [tempData, setTempData] = useState()
     const [status, setStatus] = useState({
@@ -17,26 +18,32 @@ export const PendingForApprovalRequests = () =>{
     async function sendData(indexes){
         const result = await actions.updateServicesRequestsOffers(indexes,status)
         if(result == 201){
-            console.log('hola')
+            navigate('/requestsInProcess')
         }
     }
 
     useEffect( ()=>{
-        actions.getServicesRequestsOffers()
-    },[])
+        const getData = async () => {
+            const response = await actions.getServicesRequestsOffers()
+            if(response){
+                setServiceRequestOffered(response)
+            }
+        } 
+        getData()        
+    },[actions])
 
     useEffect( ()=>{
-        setServiceRequestOffered(store.servicesRequestsOffers.filter( offered => offered.status === 'pending'))
-    },[store.servicesRequestsOffers])
+        setPendingOffers(serviceRequestOffered.filter( offered => offered.status === 'pending'))
+    },[serviceRequestOffered])
 
     useEffect( ()=>{
         const getData = async() => {
             if(store.loggedUser){
-                setOfferedToMyUser(await serviceRequestOffered.filter( offered => offered.user_client_id.email === store.loggedUser.email))
+                setOfferedToMyUser(pendingdOffers.filter( offered => offered.user_client_id.email === store.loggedUser.email))
             }
         }
         getData()        
-    },[serviceRequestOffered])
+    },[pendingdOffers, store.loggedUser])
 
     return(
         <div className="container">

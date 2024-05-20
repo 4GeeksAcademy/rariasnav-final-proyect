@@ -37,7 +37,25 @@ def get_all_users():
 def get_one_user(user_id):
     user = User.query.filter_by(id=user_id).first()
 
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+    
+    knowledges = OfferKnowledge.query.filter_by(user_id=user.id).all()
+    serialized_knowledges = list(map(lambda knowledge: knowledge.serialize_client(), knowledges))
+
+    response = {
+        'user': user.serialize(),
+        'knowledge': serialized_knowledges
+    }
+
+    return jsonify(response), 200
+
+@api.route('/user_client/<int:user_id>', methods=['GET'])
+def get_one_user_client(user_id):
+    user = User.query.filter_by(id=user_id).first()
+
     return jsonify(user.serialize()), 200
+
 
 @api.route('/user/<int:user_id>', methods=['DELETE'])
 def delete_one_user(user_id):

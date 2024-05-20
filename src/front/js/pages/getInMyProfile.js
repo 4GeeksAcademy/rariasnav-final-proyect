@@ -6,27 +6,34 @@ import "../../styles/home.css";
 export const GetInMyProfile = () =>{
     const {store, actions} = useContext(Context)
     const navigate = useNavigate()
+    const [offerKnowledge, setOfferKnowledge] = useState([])
     const [userKnowledge, setUserKnowledge] = useState([])
 
     const getUserKnowledge = (email, role) => {
         if(role == 'vendor'){
-            return store.offerKnowledge.filter(offerKnown => offerKnown.user.email === email);
+            return offerKnowledge.filter(offerKnown => offerKnown.user.email === email);
         }
     };
 
     useEffect( ()=>{
-        actions.getOfferKnowedle()
-    },[])
+        const getData = async () =>{
+            const response = await actions.getOfferKnowedle()
+            if(response){
+                setOfferKnowledge(response)
+            }
+        }
+        getData()
+    },[actions])
 
     useEffect( ()=>{
         const getData = async() => {
             if(store.loggedUser && store.loggedUser.email){
-                const knowledge = await getUserKnowledge(store.loggedUser.email, store.loggedUser.role)
+                const knowledge = getUserKnowledge(store.loggedUser.email, store.loggedUser.role)
                 setUserKnowledge(knowledge)
             }
         }
         getData()   
-    },[store.offerKnowledge, store.loggedUser])
+    },[store.offerKnowledge, store.loggedUser, offerKnowledge])
 
     return(
         <div className="container">
@@ -83,9 +90,9 @@ export const GetInMyProfile = () =>{
                                             I can offer to you...
                                         </button>
                                         <ul className="dropdown-menu dropdownKnowledge">
-                                            {userKnowledge.map( (filteredKnowledge)=>{
+                                            {userKnowledge.map( (filteredKnowledge, index)=>{
                                                 return(                                        
-                                                    <li className="dropdown-item" key={filteredKnowledge.id}>{filteredKnowledge.knowledge.description}</li>
+                                                    <li className="dropdown-item" key={index}>{filteredKnowledge.knowledge.description}</li>
                                                 )
                                             })}                         
                                         </ul>
