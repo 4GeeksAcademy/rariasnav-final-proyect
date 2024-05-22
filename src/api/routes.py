@@ -10,6 +10,7 @@ from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 
+import cloudinary.uploader
 
 api = Blueprint('api', __name__)
 
@@ -360,7 +361,7 @@ def add_service_request():
 @jwt_required()
 def delete_service_request(service_request_id):
     service_request = ServiceRequest.query.filter_by(id=service_request_id).first()
-    setattr(service_request, 'pending', False)
+    setattr(service_request, 'is_active', False)
 
     db.session.commit()
 
@@ -442,3 +443,25 @@ def update_service_request_offer(service_request_offer_id,service_request_id):
         db.session.commit()
 
         return jsonify({ 'msg': 'Service request offer updated' }), 200
+    
+@api.route('/upload_image', methods=['POST'])
+@jwt_required()
+def upload_category_icon():
+    email = get_jwt_identity()
+
+    user = User.query.filter_by(email=email).first()
+    if user is None:
+        return jsonify({ 'msg': 'Email not in system' }), 401
+        
+    if 'image' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+
+    file_to_upload = request.files['image']
+
+    if file_to_upload.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+    if file_to_upload :
+        upload_result = cloudinary.uploader.upload(file_to_upload)
+        return jsonify(upload_result), 200
+    
+    return jsonify({"msg": "No file uploaded"}), 400

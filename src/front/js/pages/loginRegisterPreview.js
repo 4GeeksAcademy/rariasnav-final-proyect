@@ -14,10 +14,11 @@ export const LoginRegisterPreview = () => {
     },[store.loggedUser, navigate])
     return(
 
-        <div className="Container">
+        <div className="container">
             <div className="body text-center m-5">
                 <div className="d-grid gap-2 m-auto" style={{width: "26rem"}}>
-                    <h1>Taskit</h1>
+                    <h1 className="text-primary-custom">Welcome to Taskit</h1>
+                    <p className="text-secondary-custom">Connect with skilled professionals for any task you need done, without leaving your home</p>
                     <button className="btn btn-primary" type="button" onClick={ ()=> navigate('/signUp') }>Sign up</button>
                     <button className="btn btn-primary" type="button" onClick={ ()=> navigate('/login') }>Log in</button>
                 </div>

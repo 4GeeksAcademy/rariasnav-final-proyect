@@ -5,9 +5,17 @@ import "../../styles/home.css";
 
 export const RequestsHistory = () => {
     const {store, actions} = useContext(Context)
-    const [servicesRequests, setServicesRequests] = useState([])
-    const [requestsByUser, setRequestsByUser] = useState([])
     const navigate = useNavigate()
+    const [servicesRequests, setServicesRequests] = useState([])
+    const [requestsByUser, setRequestsByUser] = useState([])    
+    const [tempData, setTempData] = useState()
+
+    const cancelRequest = async (filteredServiceRequestId) =>{
+        const response = await actions.cancelServiceRequest(filteredServiceRequestId)
+        if( response == 201){
+            navigate('/requestHistory')
+        }
+    }
 
     useEffect( ()=>{
         const getData = async () =>{
@@ -17,7 +25,7 @@ export const RequestsHistory = () => {
             }
         }
         getData()
-    },[actions])
+    },[actions, actions.getServicesRequests()])
 
     useEffect( ()=>{
         if(store.loggedUser){
@@ -50,8 +58,38 @@ export const RequestsHistory = () => {
                                     </div>                            
                                     <p className="">{filteredServiceRequest.description}</p>
                                     <p className="">{filteredServiceRequest.moving}</p>
-                                    <p className="">{filteredServiceRequest.tools}</p>
-                                    <button type="submit" className="btn btn-danger" onClick={ ()=>actions.cancelServiceRequest(filteredServiceRequest.id)}>Cancel request</button>
+                                    <p className="">{filteredServiceRequest.tools}</p>                                    
+                                    <button 
+                                    type="button" 
+                                    className="btn btn-danger" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#requestOfferModal"
+                                    onClick={ ()=>setTempData(filteredServiceRequest.id)}
+                                    >
+                                        Cancel request
+                                    </button>
+
+                                    <div className="modal fade" id="requestOfferModal" tabIndex="-1" aria-labelledby="exampleModalLabel" 
+                                        aria-hidden="true">
+                                        <div className="modal-dialog">
+                                            <div className="modal-content">
+                                                <div className="modal-header">
+                                                    <h1 className="modal-title fs-5">Cancel this request?</h1>
+                                                    <button 
+                                                    type="button" 
+                                                    className="btn-close" 
+                                                    data-bs-dismiss="modal" 
+                                                    aria-label="Close"
+                                                    ></button>
+                                                </div>                                          
+                                                <div className="modal-footer">
+                                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="submit" className="btn btn-danger" data-bs-dismiss="modal" 
+                                                    onClick={ ()=>cancelRequest(tempData) }>Cancel request</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>                            
                             )
                         }                        

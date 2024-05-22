@@ -1,5 +1,5 @@
 import React,{useContext, useEffect, useState} from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
 import "../../styles/home.css";
 
@@ -32,11 +32,10 @@ export const ServicesView = () => {
         <div className="services-list-view">
             <div className="album py-5 bg-body-tertiary">
     			<div className="container">
-
 					<div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-                        {categories.map( (category)=> {
+                        {categories.map( (category, index)=> {
                             return(
-                                <div className="col" key={category.id}>
+                                <div className="col" key={index}>
                                     <div className="card" style={{width:"100%", height:"225"}} >
                                         <img src="https://picsum.photos/200" className="card-img-top" alt="..."/>
                                         <div className="card-body">
@@ -44,20 +43,27 @@ export const ServicesView = () => {
                                             <p className="card-text">{category.description}</p>
                                         </div>
                                         <ul className="list-group list-group-flush">
-                                            {categoriesSubcategories.filter( categorySubcategory => categorySubcategory.service_category.name === category.name ).map( (filteredCategorySubcategory)=> {
-                                                return(
-                                                    <li className="list-group-item" key={filteredCategorySubcategory.id}>
-                                                        <a href="#" className="card-link">{filteredCategorySubcategory.service_subcategory.name}</a>
-                                                    </li>
-                                                )
-                                            })}                                            
+                                            {categoriesSubcategories.filter( 
+                                                categorySubcategory => categorySubcategory.service_category.name === category.name ).map( 
+                                                    (filteredCategorySubcategory, index)=> {
+                                                    return(
+                                                        <li className="list-group-item" key={index}>
+                                                            <Link to={`/postForAService/${filteredCategorySubcategory.id}`}>
+                                                                <span
+                                                                className="card-link">{filteredCategorySubcategory.service_subcategory.name}
+                                                                </span>
+                                                            </Link>
+                                                        </li>
+                                                    )
+                                            }
+                                            )}                                            
                                         </ul>                               
                                     </div>
                                 </div>
                             )})}
 					</div>
 				</div>
-  		</div>
+  		    </div>
         </div>
     )
 }

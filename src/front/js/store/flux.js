@@ -65,7 +65,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			createUser: async (user) => {				
 				const store = getStore()
-				const actions = getActions()
 				try {
 					const requestOptions = {
 						method: 'POST',
@@ -210,7 +209,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			postForAService: async (service_request)=>{
 				const store = getStore()
-				const actions = getActions()
 				const newData = {
 					"email": store.loggedUser.email,
 					...service_request
@@ -233,7 +231,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			getServicesRequests: async () =>{
 				const store = getStore()
-				const actions = getActions()
 				try {
 					const requestOptions = {
 						method: 'GET',
@@ -294,7 +291,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			getServicesRequestsOffers: async ()=>{
 				const store = getStore()
-				const actions = getActions()
 				try {
 					const requestOptions = {
 						method: 'GET',
@@ -313,7 +309,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			getOfferKnowedle: async ()=>{
 				const store = getStore()
-				const actions = getActions()
 				try {
 					const requestOptions = {
 						method: 'GET',
@@ -339,7 +334,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						headers: {'Content-Type':'application/JSON', 'Authorization': `Bearer ${localStorage.getItem('token')}`},
 						body: JSON.stringify(data)
 					}
-					const response = await fetch(`${store.baseURL}/service_request_offer/${index.service_request}/${index.service_request_offer}`, requestOptions)
+					const response = await fetch(`${store.baseURL}/service_request_offer/${index.service_request_offer_id}/${index.service_request_id}`, requestOptions)
 
 					if(response.ok){
 						actions.getServicesRequests()
@@ -350,7 +345,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					
 				}
-			}
+			},
 		}
 	};
 };

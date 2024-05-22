@@ -34,7 +34,7 @@ export const EditMyProfile = () => {
         setUser({...user, [event.target.name]: selectedValues});
       };
 
-    async function saveInformation(e){
+    const saveInformation = async (e) =>{
         e.preventDefault()
         const result = await actions.updateUserInformation(user)
         if( result == 201){
@@ -65,46 +65,52 @@ export const EditMyProfile = () => {
     },[])
 
     return(
-        <div className="container">
+        <div className="container background-color">
             {store.loggedUser == false && <Navigate to='/loginRegisterPreview'/>}
             {store.loggedUser &&
             <div className="body m-5">
-                <h1>Profile data</h1>
+                <h1 className="primary-text">Profile data</h1>
                     <form>
                     <div className="mb-3">
                         <label htmlFor="full_name" className="form-label">Full name</label>
-                        <input type="text" className="form-control" aria-describedby="emailHelp" name="full_name" value={user.full_name} onChange={handleChange}/>   
+                        <input type="text" className="form-control" aria-describedby="emailHelp" name="full_name" 
+                            value={user.full_name} onChange={handleChange}/>   
                             <div className="row">
                                 <div className="col-6">
                                     <label htmlFor="date_of_birth" className="form-label">Date of birth</label>
-                                    <input type="date" className="form-control" aria-describedby="emailHelp" name="date_of_birth" value={user.date_of_birth} onChange={handleChange}/>   
+                                    <input type="date" className="form-control" aria-describedby="emailHelp" name="date_of_birth" 
+                                        value={user.date_of_birth} onChange={handleChange}/>   
                                 </div>
                                 <div className="col-6">                              
                                     <label htmlFor="address" className="form-label">Address</label>
-                                    <input type="text" className="form-control" aria-describedby="emailHelp" name="address" value={user.address} onChange={handleChange}/> 
+                                    <input type="text" className="form-control" aria-describedby="emailHelp" name="address" 
+                                        value={user.address} onChange={handleChange}/> 
                                 </div>      
                             </div>                                                       
                         </div>
                         <div className="form-floating">
-                            <textarea className="form-control" placeholder="Profile resume" style={{height: "100px"}} type="text" name="profile_resume" value={user.profile_resume} onChange={handleChange}></textarea>
+                            <textarea className="form-control" placeholder="Profile resume" style={{height: "100px"}} type="text" 
+                                name="profile_resume" value={user.profile_resume} onChange={handleChange}></textarea>
                             <label htmlFor="profile_resume">Profile resume</label>
                         </div>
-                        <div className="mb-3">
-                            <label htmlFor="knowledge" className="form-label">Tasks you can offer</label>
-                            <select className="form-select" aria-label="Default select example" name="knowledge"
-                            onChange={handleSubCategoryChange} value={user.knowledge} multiple>
-                                <option disabled value={''}>Select an option</option>
-                                {subcategory.map( (subcategory, index)=>{
-                                    return(
-                                        <option key={index} value={subcategory.id}>{subcategory.name}</option> 
-                                    )
-                                })}                                             
-                            </select>                            
-                        </div>                   
-                            <button type="submit" className="btn btn-primary" onClick={ (e)=> saveInformation(e) }>Save</button>
-                            <button className="btn btn-primary m-2" onClick={ ()=> navigate('/myProfile') }>Back</button>
-                    </form>
-                
+                        {store.loggedUser.role === 'vendor' &&
+                            <div className="mb-3">
+                                <label htmlFor="knowledge" className="form-label">Tasks you can offer</label>
+                                <select className="form-select" aria-label="Default select example" name="knowledge"
+                                    onChange={handleSubCategoryChange} value={user.knowledge} multiple>
+                                    <option disabled value={''}>Select an option</option>
+                                    {subcategory.map( (subcategory, index)=>{
+                                        return(
+                                            <option key={index} value={subcategory.id}>{subcategory.name}</option> 
+                                        )
+                                    })}                                             
+                                </select>                            
+                            </div>
+                        }
+                                           
+                            <button type="submit" className="btn btn-primary-custom" onClick={ (e)=> saveInformation(e) }>Save</button>
+                            <button className="btn btn-secondary-custom m-2" onClick={ ()=> navigate('/myProfile') }>Back</button>
+                    </form>                
             </div>}
         </div>
     )

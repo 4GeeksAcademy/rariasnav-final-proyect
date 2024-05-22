@@ -13,6 +13,10 @@ from api.commands import setup_commands
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
 # from models import Person
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
@@ -48,6 +52,12 @@ app.bcrypt = bcrypt
 app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
 jwt = JWTManager(app)
 
+# Configuración cloudinary
+cloudinary.config( 
+  cloud_name = os.environ.get("CLOUDINARY_CLOUD_NAME"), 
+  api_key = os.environ.get("CLOUDINARY_API_KEY"), 
+  api_secret = os.environ.get("CLOUDINARY_API_SECRET") 
+)
 
 # Add all endpoints form the API with a "api" prefix
 app.register_blueprint(api, url_prefix='/api')
