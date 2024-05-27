@@ -101,11 +101,16 @@ export const AvailableRequests = () =>{
                                                 </div>
                                                 <div className="modal-body">
                                                     <p className="modal-title fs-5t">In order to take the task, give your rate</p>
-                                                    <div className="input-group mb-3">
-                                                        <span className="input-group-text">$</span>
-                                                        <input type="number" className="form-control" name="rate"                                                         
-                                                            value={requestServiceOffer.rate} onChange={handleChange}/>
-                                                    </div> 
+                                                    <div className="input-group mb-3">                                                        
+                                                        <input 
+                                                            type="number" 
+                                                            className="form-control" 
+                                                            placeholder="$0.00"
+                                                            name="rate"                                                         
+                                                            value={requestServiceOffer.rate} 
+                                                            onChange={handleChange}
+                                                        />
+                                                    </div>
                                                 </div>
                                                 <div className="modal-footer">
                                                     <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>

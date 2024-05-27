@@ -2,11 +2,15 @@ import React, {useContext, useEffect, useState} from "react";
 import { Context } from "../store/appContext";
 import { useNavigate, Navigate } from "react-router-dom";
 import "../../styles/home.css";
+import defaultProfilePicture from "../../../../docs/assets/defaultProfilePicture.jpg"
 
 export const EditMyProfile = () => {
     const {store, actions} = useContext(Context)
     const navigate = useNavigate()
     const [subcategory, setSubcategory] = useState([])
+    const [showingProfilePicture, setShowingProfilePicture] = useState(null)
+    const [profilePicture, setProfilePicture] = useState(null)
+    const [preview, setPreview] = useState(null);
     const [user, setUser] = useState({
         "full_name": "",
         "date_of_birth": "",
@@ -42,6 +46,39 @@ export const EditMyProfile = () => {
         }
     }
 
+    const handleImage = async (e) =>{
+        const pictureToUpload = e.target.files[0]
+        setProfilePicture(pictureToUpload)
+
+        if(pictureToUpload){
+            const reader = new FileReader();
+            reader.onloadend = () =>{
+                setPreview(reader.result)
+            }
+        reader.readAsDataURL(pictureToUpload)
+        } else {
+            setPreview(null)
+        }
+    }
+
+    const handleImageSubmit = async (e) =>{
+        e.preventDefault()
+        if(!profilePicture){
+            alert('Please, select a picture first.')
+            return;
+        } 
+
+        const formData = new FormData();
+        formData.append('profile_picture', profilePicture)
+
+        const result = await actions.updateProfilePicture(formData)
+        if(result){
+            alert('Profile picture updated');
+            document.getElementById("closeProfilePicModalButton").click();
+            await actions.getInMyProfile()
+        }
+    }
+
     useEffect( ()=> {
         if(store.loggedUser){
             setUser({
@@ -50,7 +87,8 @@ export const EditMyProfile = () => {
                 "address": store.loggedUser.address,
                 "profile_resume": store.loggedUser.profile_resume,
                 "knowledge": store.loggedUser.knowledge
-            })
+            }),
+            setShowingProfilePicture(store.loggedUser.profile_picture)
         }
     },[store.loggedUser] )
 
@@ -70,6 +108,20 @@ export const EditMyProfile = () => {
             {store.loggedUser &&
             <div className="body m-5">
                 <h1 className="primary-text">Profile data</h1>
+                    <div className="profile-header-edit text-center mb-4">
+                        <div className="profile-picture-edit-container">
+                            <img src={showingProfilePicture ? showingProfilePicture : defaultProfilePicture} className="profile-picture-edit" alt="Profile"/>
+                            <button 
+                                type="button" 
+                                className="btn btn-light ms-2 edit-picture-btn" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#profilePicEditModal"
+                                >
+                                <i className="fa-solid fa-gear"></i>
+                            </button>
+                        </div>                        
+                    </div>
+
                     <form>
                     <div className="mb-3">
                         <label htmlFor="full_name" className="form-label">Full name</label>
@@ -112,6 +164,44 @@ export const EditMyProfile = () => {
                             <button className="btn btn-secondary-custom m-2" onClick={ ()=> navigate('/myProfile') }>Back</button>
                     </form>                
             </div>}
+
+            <div className="modal fade" id="profilePicEditModal" tabIndex="-1" aria-labelledby="profilePicModalLabel" aria-hidden="true">
+                <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title" id="profilePicModalLabel">Update Profile Picture</h5>
+                            <button 
+                                type="button" 
+                                className="btn-close" 
+                                data-bs-dismiss="modal" 
+                                aria-label="Close"
+                                id="closeProfilePicModalButton"
+                                >
+                            </button>
+                        </div>
+                        <div className="picture-upload-container m-2">
+                            <form onSubmit={handleImageSubmit} className="picture-upload-form">
+                                <input 
+                                    type="file" 
+                                    accept="image/*"
+                                    className="form-control mb-3"
+                                    onChange={handleImage}
+                                    name="profile_picture"
+                                    />
+                                    {preview && (
+                                        <div className="preview-container">
+                                            <img src={preview} alt="Selected" className="preview-image" />
+                                        </div>
+                                    )}  
+                                    <div className="modal-footer">
+                                        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" className="btn btn-primary">Update</button>
+                                    </div>                             
+                            </form>
+                        </div>                        
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }

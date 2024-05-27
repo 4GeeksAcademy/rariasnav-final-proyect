@@ -86,7 +86,7 @@ export const PendingForApprovalRequests = () =>{
                                         <div className="modal-dialog">
                                             <div className="modal-content">
                                                 <div className="modal-header">
-                                                    <h1 className="modal-title fs-5" primary-text>Are you sure to take this tasker?</h1>
+                                                    <h1 className="modal-title fs-5">Are you sure to take this tasker?</h1>
                                                     <button 
                                                     type="button" 
                                                     className="btn-close" 

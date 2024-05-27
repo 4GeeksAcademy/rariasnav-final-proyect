@@ -49,7 +49,7 @@ app.bcrypt = bcrypt
 #Fin configuración bcrypt
 
 # Setup the Flask-JWT-Extended extension
-app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
+app.config["JWT_SECRET_KEY"] = os.getenv("FLASK_APP_KEY")  # Change this!
 jwt = JWTManager(app)
 
 # Configuración cloudinary

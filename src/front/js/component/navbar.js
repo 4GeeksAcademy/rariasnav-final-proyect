@@ -15,7 +15,7 @@ export const Navbar = () => {
 		<nav className="navbar custom-navbar">
 			<div className="container">
 				<Link to="/">
-					<span className="navbar-brand mb-0 h1"><h1>Taskit</h1></span>
+					<span className="navbar-brand mb-0 h1"><h2>Taskit</h2></span>
 				</Link>
 				<div className="ml-auto">
 					{store.loggedUser == null && <span>Loading...</span>}	

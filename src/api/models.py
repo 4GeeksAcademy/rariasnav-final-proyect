@@ -25,11 +25,13 @@ class User(db.Model):
     profile_resume = db.Column(db.String(350), unique=False, nullable=True)
     role = db.Column(db.Enum(Roles), unique=False, nullable=False)
     gender = db.Column(db.Enum(ChooseGender), unique=False, nullable=True)
+    profile_picture = db.Column(db.String(100), unique=False, nullable=True)
     personal_document = db.relationship('PersonalDocument', backref='user', lazy=True)       
     # nationality_id = db.Column(db.Integer, db.ForeignKey('country.id'), nullable=True)
     nationality = db.Column(db.String(120), unique=False, nullable=True)
     service_request = db.relationship('ServiceRequest', backref='user', lazy=True) 
     offer_knowledge = db.relationship('OfferKnowledge', backref='user', lazy=True) 
+    picture_user_upload = db.relationship('PictureUserUpload', backref='user', lazy=True) 
     service_request_offer = db.relationship('ServiceRequestOffer', uselist=True, backref='user', foreign_keys='ServiceRequestOffer.user_client_id', lazy=True)
     service_request_offer = db.relationship('ServiceRequestOffer', uselist=True, backref='user', foreign_keys='ServiceRequestOffer.user_vendor_id', lazy=True)
 
@@ -56,7 +58,8 @@ class User(db.Model):
             "gender": self.gender.name,
             "profile_resume": self.profile_resume,
             "personal_documents": personal_documents,
-            "nationality": self.nationality
+            "nationality": self.nationality,
+            "profile_picture": self.profile_picture
         }
     def serialize_vendor_knowledge(self):
         knowledge = OfferKnowledge.query.filter_by(user_id=self.id).first()
@@ -215,7 +218,7 @@ class ServiceRequest(db.Model):
 class ServiceRequestOfferStatus(enum.Enum):
     accepted = 'accepted'
     pending = 'pending'
-    declined = 'declined'
+    finished = 'finished'
 
 class ServiceRequestOffer(db.Model):
     __tablename__='servicerequestoffer'
@@ -281,4 +284,26 @@ class OfferKnowledge(db.Model):
         return {
             "id": self.id,
             "knowledge": knowledge
+        }
+    
+class PictureUserUpload(db.Model):
+    __tablename__ = 'pictureuserupload'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    gallery_pictures = db.Column(db.String(100), unique=False, nullable=True)
+    gallery_pictures_public_id = db.Column(db.String(80), unique=False, nullable=True)
+
+    def __repr__(self):
+        return f'<PictureUserUpload {self.id}>'
+    
+    def serialize(self):
+        user = User.query.get(self.user_id)
+        if user is not None:
+            user = user.serialize()
+
+        return {
+            "id": self.id,
+            "user": user,
+            "gallery_pictures": self.gallery_pictures,
+            "gallery_pictures_public_id": self.gallery_pictures_public_id
         }

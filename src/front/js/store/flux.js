@@ -346,6 +346,51 @@ const getState = ({ getStore, getActions, setStore }) => {
 					
 				}
 			},
+			updateProfilePicture: async (pictureFile) =>{
+				const store = getStore()
+				try {
+					const response = await fetch(`${store.baseURL}/upload_profile_picture`, {
+						method: ['PUT'],
+						body: pictureFile,
+						headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}
+					})
+					return response.status
+				} catch (error) {
+					
+				}
+			},
+			uploadGalleryPicture: async (galleryPicture) =>{
+				const store = getStore()
+
+				try {
+					const response = await fetch(`${store.baseURL}/user_gallery_pictures`, {
+						method: ['POST'],
+						body: galleryPicture,
+						headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}
+					})
+					return response.status
+					
+				} catch (error) {
+					console.log('Error uploading gallery picture', error)
+				}
+			},
+			getGalleryPictures: async () =>{
+				const store = getStore()
+				try {
+					const requestOptions = {
+						method: ['GET'],
+						headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}
+					}
+					const response = await fetch(`${store.baseURL}/user_gallery_pictures`, requestOptions)
+					const data = await response.json()
+					if(response.ok){
+						return data
+					}
+					return false
+				} catch (error) {
+					return false
+				}
+			},
 		}
 	};
 };

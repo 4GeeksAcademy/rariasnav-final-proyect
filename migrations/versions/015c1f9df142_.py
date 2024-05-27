@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: ae97086fc5e4
+Revision ID: 015c1f9df142
 Revises: 
-Create Date: 2024-05-11 12:38:46.332469
+Create Date: 2024-05-25 22:36:35.875156
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ae97086fc5e4'
+revision = '015c1f9df142'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -48,6 +48,7 @@ def upgrade():
     sa.Column('profile_resume', sa.String(length=350), nullable=True),
     sa.Column('role', sa.Enum('client', 'vendor', name='roles'), nullable=False),
     sa.Column('gender', sa.Enum('non_binary', 'female', 'male', name='choosegender'), nullable=True),
+    sa.Column('profile_picture', sa.String(length=100), nullable=True),
     sa.Column('nationality', sa.String(length=120), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
@@ -69,6 +70,14 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('code')
+    )
+    op.create_table('pictureuserupload',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('gallery_pictures', sa.String(length=100), nullable=True),
+    sa.Column('gallery_pictures_public_id', sa.String(length=80), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('servicecategorysubcategory',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -95,7 +104,7 @@ def upgrade():
     op.create_table('servicerequestoffer',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('service_request_id', sa.Integer(), nullable=False),
-    sa.Column('status', sa.Enum('accepted', 'pending', 'declined', name='servicerequestofferstatus'), nullable=False),
+    sa.Column('status', sa.Enum('accepted', 'pending', 'finished', name='servicerequestofferstatus'), nullable=False),
     sa.Column('user_client_id', sa.Integer(), nullable=False),
     sa.Column('user_vendor_id', sa.Integer(), nullable=False),
     sa.Column('rate', sa.Integer(), nullable=False),
@@ -112,6 +121,7 @@ def downgrade():
     op.drop_table('servicerequestoffer')
     op.drop_table('servicerequest')
     op.drop_table('servicecategorysubcategory')
+    op.drop_table('pictureuserupload')
     op.drop_table('personaldocument')
     op.drop_table('offerknowledge')
     op.drop_table('user')

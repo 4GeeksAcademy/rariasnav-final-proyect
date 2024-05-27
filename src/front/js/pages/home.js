@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import "../../styles/home.css";
-import ImageUpload from "../component/imageUpload";
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);

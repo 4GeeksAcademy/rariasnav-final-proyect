@@ -2,10 +2,11 @@ import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import "../../styles/home.css";
 
-export const PictureUploads = () =>{
+export const PictureUploads = (props) =>{
     const {actions, store} = useContext(Context);
     const [selectedFile, setSelectedFile] = useState(null);
     const [preview, setPreview] = useState(null);
+    console.log(props.user_id)
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -28,11 +29,12 @@ export const PictureUploads = () =>{
             alert('Please select a file first.');
             return;
         }
+        
         const formData = new FormData();
         formData.append('image', selectedFile);
 
         try {
-            const response = await fetch(`${store.baseURL}/upload_image`,{
+            const response = await fetch(`${store.baseURL}/upload_user_pictures`,{
                 method: 'POST',
                 headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`},
                 body: formData,

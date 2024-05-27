@@ -35,7 +35,7 @@ export const PostForAService = () => {
     },[store.loggedUser])
 
     return(
-        <div className="container-custom">
+        <div className="container">
             {!store.loggedUser && (
                 <div className="body-custom m-5">
                     <div className="text-center ">

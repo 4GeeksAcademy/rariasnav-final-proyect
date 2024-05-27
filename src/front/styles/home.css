@@ -15,6 +15,7 @@
     --text-color: #6C757D;
     --hover-color: #0056b3;
     --border-color: #0056b3;
+    --hover-secondary-color: #287b3c;
 }
 
 body {
@@ -31,17 +32,6 @@ a {
 
 a:hover {
     color: var(--hover-color);
-}
-
-button {
-    background-color: var(--primary-color);
-    color: #fff;
-    border: 1px solid var(--border-color);
-}
-
-button:hover {
-    background-color: var(--hover-color);
-    color: #fff;
 }
 
 .profile-body {
@@ -65,7 +55,13 @@ button:hover {
     width: 150px;
     height: 150px;
     object-fit: cover;
-    border: 5px solid var(--primary-color);
+}
+
+.profile-picture-edit {
+    border-radius: 50%;
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
 }
 
 .profile-name {
@@ -135,7 +131,6 @@ button:hover {
 .jumbotron {
     background-color: var(--background-light-color);
     color: var(--text-color);
-    border: 1px solid var(--primary-color);
 }
 
 .card {
@@ -145,11 +140,7 @@ button:hover {
     border-color: var(--border-color);
 }
 
-.card-title {
-    color: var(--primary-color);
-}
-
-.card-text {
+.card-text, .card-subtitle, .text-color {
     color: var(--text-color);
 }
 
@@ -157,25 +148,9 @@ button:hover {
     color: var(--secondary-color);
 }
 
-.card-subtitle {
-    color: var(--text-color);
-}
-
 .btn-outline-primary {
     color: var(--primary-color);
     border-color: var(--primary-color);
-}
-
-.btn-outline-primary:hover {
-    background-color: var(--primary-color);
-    color: var(--background-color);
-    color: #fff;
-}
-
-.album {
-    background-color: var(--background-light-color);
-    padding: 20px;
-    border-radius: 10px;
 }
 
 .bd-placeholder-img {
@@ -189,7 +164,7 @@ button:hover {
     padding: 10px 0;
 }
 
-.custom-navbar .navbar-brand h1 {
+.custom-navbar .navbar-brand h2 {
     color: var(--primary-color);
     font-weight: bold;
 }
@@ -211,8 +186,8 @@ button:hover {
 }
 
 .custom-navbar .navbar-buttons .btn-secondary:hover {
-    background-color: var(--secondary-color), 10%;
-    border-color: var(--secondary-color), 10%;
+    background-color: var(--hover-secondary-color);
+    border-color: var(--hover-secondary-color);
     color: #fff;
 }
 
@@ -261,11 +236,11 @@ button:hover {
     color: var(--accent-color1);
 }
 
-.primary-text {
+.primary-text, .text-primary-custom, .card-title  {
     color: var(--primary-color);
 }
 
-.secondary-text {
+.secondary-text, .background-color {
     background-color: var(--background-color);
 }
 
@@ -294,25 +269,9 @@ button:hover {
     background-color: var(--hover-color);
     border-color: var(--hover-color);
 }
-.background-color {
-    background-color: var(--background-color);
-}
 
 .background-light-color {
     background-color: var(--background-light-color);
-}
-
-.text-color {
-    color: var(--text-color);
-}
-
-.border-color {
-    border-color: var(--border-color);
-}
-
-.container-custom {
-    background-color: var(--background-color);
-    color: var(--text-color);
 }
 
 .body-custom {
@@ -320,10 +279,6 @@ button:hover {
     color: var(--text-color);
     padding: 20px;
     border-radius: 10px;
-}
-
-.text-primary-custom {
-    color: var(--primary-color);
 }
 
 .text-secondary-custom {
@@ -367,7 +322,7 @@ button:hover {
     border-color: var(--hover-color);
 }
 
-.request-item {
+.request-item, .album {
     background-color: var(--background-color);
     border: 1px solid var(--border-color);
     padding: 20px;
@@ -432,3 +387,43 @@ button:hover {
 .picture-upload-container .btn {
     margin-top: 10px;
 }
+
+.profile-header-edit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-header-edit img {
+    border-radius: 50%;
+}
+
+.profile-picture-edit-container {
+    position: relative;
+    display: inline-block;
+}
+
+@media (min-width: 576px) {
+    .profile-header-edit {
+        flex-direction: row;
+    }
+
+    .profile-header-edit .btn {
+        margin-left: 15px;
+    }
+}
+
+.edit-picture-btn {
+    position: absolute;
+    bottom: 10px; 
+    right: 10px; 
+    background-color: white;
+    border: none;
+    padding: 5px;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.edit-picture-btn i {
+    font-size: 1.2rem;
+} 

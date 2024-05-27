@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint, current_app
-from api.models import db, User, PersonalDocument, ServiceCategory, ServiceSubCategory, ServiceCategorySubCategory, ServiceRequest, ServiceRequestOffer, OfferKnowledge
+from api.models import db, User, PersonalDocument, ServiceCategory, ServiceSubCategory, ServiceCategorySubCategory, ServiceRequest, ServiceRequestOffer, OfferKnowledge, PictureUserUpload
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -444,24 +444,67 @@ def update_service_request_offer(service_request_offer_id,service_request_id):
 
         return jsonify({ 'msg': 'Service request offer updated' }), 200
     
-@api.route('/upload_image', methods=['POST'])
+@api.route('/upload_profile_picture', methods=['PUT'])
 @jwt_required()
-def upload_category_icon():
+def upload_user_pictures():
+    email = get_jwt_identity()
+    data_file = request.files
+
+    user = User.query.filter_by(email=email).first()
+    if user is None:
+        return jsonify({ 'msg': 'Email not in system' }), 401
+
+    profile_picture = data_file.get("profile_picture")
+
+    if 'profile_picture' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+
+    result_profile_picture = cloudinary.uploader.upload(profile_picture)
+    user.profile_picture = result_profile_picture['secure_url']
+
+    db.session.commit()
+
+    return jsonify({"msg": "Profile picture updated"}), 200
+
+@api.route('/user_gallery_pictures', methods=['POST'])
+@jwt_required()
+def upload_gallery_picture():
+    email = get_jwt_identity()
+    data_file = request.files
+    data_form = request.form
+
+    user= User.query.filter_by(email=email).first()
+    if user is None:
+        return jsonify({"msg": "Email not in system"}), 401
+    
+    gallery_picture = data_file.get('gallery_picture')
+
+    if gallery_picture is None:
+        return jsonify({"error": "No file part"}), 400
+    
+    result_gallery_picture = cloudinary.uploader.upload(gallery_picture)
+
+    if gallery_picture:    
+        new_gallery_picture = PictureUserUpload(
+            user = user,
+            gallery_pictures = result_gallery_picture.get("secure_url"),
+            gallery_pictures_public_id = result_gallery_picture.get("public_id")
+        ) 
+        db.session.add(new_gallery_picture)
+        db.session.commit()
+
+        return jsonify({ 'msg': 'Gallery picture uploaded' }), 200
+
+@api.route('/user_gallery_pictures', methods=['GET'])
+@jwt_required()
+def get_user_gallery_pictures():
     email = get_jwt_identity()
 
     user = User.query.filter_by(email=email).first()
     if user is None:
         return jsonify({ 'msg': 'Email not in system' }), 401
-        
-    if 'image' not in request.files:
-        return jsonify({"error": "No file part"}), 400
-
-    file_to_upload = request.files['image']
-
-    if file_to_upload.filename == '':
-        return jsonify({"error": "No selected file"}), 400
-    if file_to_upload :
-        upload_result = cloudinary.uploader.upload(file_to_upload)
-        return jsonify(upload_result), 200
     
-    return jsonify({"msg": "No file uploaded"}), 400
+    if user:
+        user_pictures = PictureUserUpload.query.all()
+        result = list(map(lambda pictures: pictures.serialize(), user_pictures))
+        return jsonify(result), 200
